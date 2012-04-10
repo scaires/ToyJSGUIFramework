@@ -166,16 +166,28 @@ function GUI()
     }
   }
 
-  this.drawText = function(x, y, color, text, size, bold)
+  this.drawText = function(text, x, y, maxWidth, maxHeight, color, textSize, font, bold)
   {
     boldText = "";
     if (bold)
     {
       boldText = "bold";
     }
-    myContext.font = boldText + (size.toString() + "px Arial");
+    myContext.font = boldText + (textSize.toString() + "px " + font);
     myContext.fillStyle = color;
-    myContext.fillText(text, x, y);
+    myContext.textBaseline = "top";
+    var correctedX = x;
+    var correctedY = y;
+    var textWidth = myContext.measureText(text).width;
+    if (textWidth < maxWidth)
+    {
+      correctedX = x + (maxWidth - textWidth)/2;
+    }
+    if (textSize < maxHeight)
+    {
+      correctedY = y + (maxHeight - textSize)/2;
+    }
+    myContext.fillText(text, correctedX, correctedY, maxWidth);
   }
   
   this.onMouseDown = function (x, y)
@@ -206,10 +218,8 @@ function GUIView(gui)
   this.myName = "default";
   this.myParentId = -1;
   this.myId = 0;
-  this.myPaddingLeft = 0;
-  this.myPaddingRight = 0;
-  this.myPaddingTop = 0;
-  this.myPaddingBottom = 0;
+  this.myMargin = 0; //margin is outside
+  this.myPadding = 0; //padding is inside
   this.myGravity = 0;
   this.myBackgroundColor = "rgba(0, 0, 0, 1.0)";
   this.hasBorder = false;
@@ -242,15 +252,21 @@ GUIView.prototype.inflate = function(viewJSON)
   {
     this.setBackgroundColor(viewJSON.backgroundColor);
   }
+  if (viewJSON.borderColor && viewJSON.borderSize && viewJSON.borderSize.match(/^\d+(px)?$/))
+  {
+    this.hasBorder = true;
+    this.myBorderColor = viewJSON.borderColor;
+    this.myBorderSize = eval(/^\d+/.exec(viewJSON.borderSize)[0])
+  }
   if (viewJSON.layout_width)
   {
     //pixel width
     if (viewJSON.layout_width.match(/^\d+(px)?$/))
     {
-      this.myWidth = eval(/^\d+/.exec(viewJSON.layout_width)[0])
+      this.myWidth = eval(/^\d+/.exec(viewJSON.layout_width)[0]);
     //percent width
     } else if (viewJSON.layout_width.match(/^\d+%$/)) {
-      this.myWidth = eval(/^\d+/.exec(viewJSON.layout_width)[0])
+      this.myWidth = eval(/^\d+/.exec(viewJSON.layout_width)[0]);
       this.isWidthPercent = true;        
     } else if (viewJSON.layout_width === "wrap_content") {
       this.isWidthWrap = true;
@@ -277,6 +293,14 @@ GUIView.prototype.inflate = function(viewJSON)
   if (viewJSON.layout_gravity)
   {
     this.setGravity(eval(viewJSON.layout_gravity));
+  }
+  if (viewJSON.padding && viewJSON.padding.match(/^\d+(px)?$/))
+  {
+    this.myPadding = eval(/^\d+/.exec(viewJSON.padding)[0]);
+  }
+  if (viewJSON.layout_margin && viewJSON.layout_margin.match(/^\d+(px)?$/))
+  {
+    this.myMargin = eval(/^\d+/.exec(viewJSON.layout_margin)[0]);
   }
 }
 
@@ -362,16 +386,16 @@ GUIView.prototype.measureX = function(x, width)
 {
   if (this.isWidthFill)
   {
-    return width;
+    return width - this.myMargin*2;
   } else if (this.isWidthWrap) {
     var contentWidth = Math.min(this.measureContentWidth(), width);
-    return contentWidth;
+    return contentWidth - this.myMargin*2;
   } else if (this.isWidthPercent) {
     var contentWidth = Math.min((this.myWidth / 100.0) * (this.myGUI.getCanvas().width), width);
-    return contentWidth;
+    return contentWidth - this.myMargin*2;
   } else {
     var contentWidth = Math.min(this.myWidth, width);
-    return contentWidth;
+    return contentWidth - this.myMargin*2;
   }
 }
 
@@ -379,16 +403,16 @@ GUIView.prototype.measureY = function(y, height)
 {
   if (this.isHeightFill)
   {
-    return height;
+    return height - this.myMargin*2;
   } else if (this.isHeightWrap) {
     var contentHeight = Math.min(this.measureContentHeight(), height);
-    return contentHeight;
+    return contentHeight - this.myMargin*2;
   } else if (this.isHeightPercent) {
     var contentHeight = Math.min((this.myHeight / 100.0) * (this.myGUI.getCanvas().height), height);
-    return contentHeight;
+    return contentHeight - this.myMargin*2;
   } else {
     var contentHeight = Math.min(this.myHeight, height);
-    return contentHeight;
+    return contentHeight - this.myMargin*2;
   }
 }
 
@@ -397,11 +421,11 @@ GUIView.prototype.offsetX = function(x, width)
   var contentWidth = this.measureX(x, width);
   if (this.myGravity == GUI_LAYOUT_GRAVITY_CENTER || this.myGravity == GUI_LAYOUT_GRAVITY_TOP || this.myGravity == GUI_LAYOUT_GRAVITY_BOTTOM)
   {
-    return x + ((width - contentWidth)/2);
+    return x + this.myMargin + ((width - this.myMargin*2 - contentWidth)/2);
   } else if (this.myGravity == GUI_LAYOUT_GRAVITY_RIGHT || this.myGravity == GUI_LAYOUT_GRAVITY_TOPRIGHT || this.myGravity == GUI_LAYOUT_GRAVITY_BOTTOMRIGHT) {
-    return x + (width - contentWidth);
+    return x + this.myMargin + (width - this.myMargin*2 - contentWidth);
   } else {
-    return x;
+    return x + this.myMargin;
   }
 }
 
@@ -410,11 +434,11 @@ GUIView.prototype.offsetY = function(y, height)
   var contentHeight = this.measureY(y, height);
   if (this.myGravity == GUI_LAYOUT_GRAVITY_CENTER || this.myGravity == GUI_LAYOUT_GRAVITY_RIGHT || this.myGravity == GUI_LAYOUT_GRAVITY_LEFT)
   {
-    return y + ((height - contentHeight)/2);
+    return y + this.myMargin + ((height - this.myMargin*2 - contentHeight)/2);
   } else if (this.myGravity == GUI_LAYOUT_GRAVITY_TOP || this.myGravity == GUI_LAYOUT_GRAVITY_TOPRIGHT || this.myGravity == GUI_LAYOUT_GRAVITY_TOPLEFT) {
-    return y;
+    return y + this.myMargin;
   } else {
-    return y + (height - contentHeight);
+    return y + this.myMargin + (height - this.myMargin*2 - contentHeight);
   }
 }
 
@@ -695,17 +719,62 @@ GUILinearLayout.prototype.draw = function(x, y, width, height){
 function GUITextView(gui)
 {
   this.myGUI = gui;
+  this.myText = "";
+  this.myTextColor = "rgb(0,0,0)";
+  this.myTextSize = 10;
+  this.myFont = "Arial",
+  this.isTextBold = false;
 }
 GUITextView.inheritsFrom(GUIView);
-/* END TEXTVIEW */
-
-/* IMAGEVIEW */
-function GUIImageView(gui)
+//Override
+GUITextView.prototype.inflate = function(viewJSON)
 {
-  this.myGUI = gui;
+  GUITextView.prototype.parent.inflate.call(this, viewJSON);
+  if (viewJSON.text) 
+  {
+    this.myText = viewJSON.text;
+    if (viewJSON.textColor) 
+    {
+      this.myTextColor = viewJSON.textColor;
+    }
+    if (viewJSON.textSize && viewJSON.textSize.match(/^\d+(px)?$/))
+    {
+      this.myTextSize = eval(/^\d+/.exec(viewJSON.textSize)[0])
+    }
+    if (viewJSON.isTextBold && viewJSON.isTextBold === "true" || viewJSON.isTextBold === "false")
+    {
+      this.myTextSize = eval(viewJSON.isTextBold);
+    }
+    if (viewJSON.font)
+    {
+      this.myFont = viewJSON.font;
+    }
+  }
 }
-GUIImageView.inheritsFrom(GUIView);
-/* END IMAGEVIEW */
+
+//Override
+GUITextView.prototype.measureContentWidth = function()
+{
+  return Math.min(this.myPadding * 2 + myGui.getContext().measureText(this.myText), 
+    GUITextView.prototype.parent.measureContentWidth.call(this));
+}
+
+//Override
+GUITextView.prototype.measureContentHeight = function()
+{
+  return Math.min(this.myPadding * 2 + this.myTextSize, 
+    GUITextView.prototype.parent.measureContentHeight.call(this));
+}
+
+//Override
+GUITextView.prototype.draw = function(x, y, width, height)
+{ 
+  GUITextView.prototype.parent.draw.call(this, x, y, width, height);
+  this.myGUI.drawText(this.myText, x + this.myPadding, y + this.myPadding, width - this.myPadding*2, height - this.myPadding*2,
+    this.myTextColor, this.myTextSize, this.isTextBold);
+}
+
+/* END TEXTVIEW */
 
 /* BUTTONVIEW */
 function GUIButtonView(gui)

@@ -48,6 +48,7 @@ LayoutA = {
           backgroundColor : "rgb(0, 0, 130)",
           layout_width : "25%",
           layout_height : "100",
+          layout_margin : "5",
           layout_gravity : "GUI_LAYOUT_GRAVITY_RIGHT"
         },
         {
@@ -107,8 +108,9 @@ LayoutA = {
         name : "layout4",
         klass : "GUILinearLayout",
         backgroundColor : "rgba(130, 130, 130, 0.5)",
-        layout_width : "wrap_content",
+        layout_width : "33%",
         layout_height : "fill_parent",
+        layout_margin : "5",
         layout_gravity : "GUI_LAYOUT_GRAVITY_LEFT",
         layout_orientation : "GUI_LINEARLAYOUT_ORIENTATION_VERTICAL",
         layout_children : [
@@ -116,15 +118,26 @@ LayoutA = {
             name : "view7",
             klass : "GUIView",
             backgroundColor : "rgba(130, 0, 0, 0.5)",
+            borderColor : "rgb(0,0,0)",
+            borderSize : "5px",
             layout_width : "50",
             layout_height : "50",
+            layout_margin : "5",
             layout_gravity : "GUI_LAYOUT_GRAVITY_CENTER"
           },
           {
             name : "view8",
-            klass : "GUIView",
+            klass : "GUITextView",
             backgroundColor : "rgba(0, 0, 130, 0.5)",
-            layout_width : "50",
+            borderColor : "rgb(0,0,0)",
+            borderSize : "5px",
+            padding : "0px",
+            text : "HELLO WORLD",
+            textSize : "20px",
+            textBold : "true",
+            textFont : "sans-serif",
+            layout_width : "fill_parent",
+            layout_margin : "5px",
             layout_height : "50",
             layout_gravity : "GUI_LAYOUT_GRAVITY_CENTER"
           }
