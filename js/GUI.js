@@ -291,6 +291,23 @@ GUIView.prototype.getId = function()
   return this.myId;
 }
 
+GUIView.prototype.setParent = function(view)
+{
+  this.myParentId = view.getId();
+}
+
+GUIView.prototype.getParent = function()
+{
+  if (this.myParentId != -1)
+  {
+    return myGUI.findViewById(this.myParentId);
+  } else {
+    return undefined;
+  }
+  
+  this.myParentId = view.getId();
+}
+
 GUIView.prototype.setName = function(name)
 {
   if (name)
@@ -347,10 +364,10 @@ GUIView.prototype.measureX = function(x, width)
   {
     return width;
   } else if (this.isWidthWrap) {
-    var contentWidth = Math.min(this.measureContentWidth(x, width), width);
+    var contentWidth = Math.min(this.measureContentWidth(), width);
     return contentWidth;
   } else if (this.isWidthPercent) {
-    var contentWidth = Math.min((this.myWidth / 100.0) * (width), width);
+    var contentWidth = Math.min((this.myWidth / 100.0) * (this.myGUI.getCanvas().width), width);
     return contentWidth;
   } else {
     var contentWidth = Math.min(this.myWidth, width);
@@ -364,10 +381,10 @@ GUIView.prototype.measureY = function(y, height)
   {
     return height;
   } else if (this.isHeightWrap) {
-    var contentHeight = Math.min(this.measureContentHeight(y, height), height);
+    var contentHeight = Math.min(this.measureContentHeight(), height);
     return contentHeight;
   } else if (this.isHeightPercent) {
-    var contentHeight = Math.min((this.myHeight / 100.0) * (height), height);
+    var contentHeight = Math.min((this.myHeight / 100.0) * (this.myGUI.getCanvas().height), height);
     return contentHeight;
   } else {
     var contentHeight = Math.min(this.myHeight, height);
@@ -418,6 +435,8 @@ GUIView.prototype.measureContentWidth = function()
   if (!this.isWidthPercent && !this.isWidthFill && !this.isWidthWrap)
   {
     return this.myWidth;
+  } else if (this.isWidthPercent) {
+    return (this.myWidth / 100.0) * (this.myGUI.getCanvas().width);
   } else {
     return 0;
   }
@@ -428,6 +447,8 @@ GUIView.prototype.measureContentHeight = function()
   if (!this.isHeightPercent && !this.isHeightFill && !this.isHeightWrap)
   {
     return this.myHeight;
+  } else if (this.isHeightPercent) {
+    return (this.myHeight / 100.0) * (this.myGUI.getCanvas().height)
   } else {
     return 0;
   }
@@ -451,6 +472,7 @@ GUILayout.prototype.init = function()
 
 GUILayout.prototype.addChild = function(view)
 {
+  view.setParent(this);
   this.myChildren.push(view);
 }
 
@@ -664,9 +686,9 @@ GUILinearLayout.prototype.draw = function(x, y, width, height){
 
     if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
     {
-      child.draw(childOffsetX, childOffsetY, childWidth, contentHeight);
+      child.draw(childOffsetX, childOffsetY, childWidth, contentHeight - offsetY);
     } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
-      child.draw(childOffsetX, childOffsetY, contentWidth, childHeight);
+      child.draw(childOffsetX, childOffsetY, contentWidth - offsetX, childHeight);
     }
 
     if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
