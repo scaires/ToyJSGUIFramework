@@ -249,7 +249,7 @@ GUIView.prototype.inflate = function(viewJSON)
     {
       this.myWidth = eval(/^\d+/.exec(viewJSON.layout_width)[0])
     //percent width
-    } else if (viewJSON.layout_width.match(/^\d+pc$/)) {
+    } else if (viewJSON.layout_width.match(/^\d+%$/)) {
       this.myWidth = eval(/^\d+/.exec(viewJSON.layout_width)[0])
       this.isWidthPercent = true;        
     } else if (viewJSON.layout_width === "wrap_content") {
@@ -265,7 +265,7 @@ GUIView.prototype.inflate = function(viewJSON)
     {
       this.myHeight = eval(/^\d+/.exec(viewJSON.layout_height)[0])
     //percent height
-    } else if (viewJSON.layout_height.match(/^\d+pc$/)) {
+    } else if (viewJSON.layout_height.match(/^\d+%$/)) {
       this.myHeight = eval(/^\d+/.exec(viewJSON.layout_height)[0])
       this.isHeightPercent = true;        
     } else if (viewJSON.layout_height === "wrap_content") {
