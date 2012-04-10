@@ -643,24 +643,14 @@ GUILinearLayout.prototype.draw = function(x, y, width, height){
     var parentHeight = this.measureY(y, height);
     if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
     {
-      var contentHeight = child.measureContentHeight();
-      if (child.isHeightPercent)
-      {
-        contentHeight = parentHeight;
-      }
       childOffsetX = parentX;
       childOffsetY = child.offsetY(parentY + offsetY, child.measureContentHeight());
       childWidth = parentWidth;
-      childHeight = child.measureY(parentY + offsetY, contentHeight);
+      childHeight = child.measureY(parentY + offsetY, parentHeight - offsetY);
     } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
-      var contentWidth = child.measureContentWidth();
-      if (child.isWidthPercent)
-      {
-        contentWidth = parentWidth;
-      }
       childOffsetX = child.offsetX(parentX + offsetX, child.measureContentWidth());
       childOffsetY = parentY;
-      childWidth = child.measureX(parentX + offsetX, contentWidth);
+      childWidth = child.measureX(parentX + offsetX, parentWidth - offsetX);
       childHeight = parentHeight;
     }
 
@@ -686,9 +676,9 @@ GUILinearLayout.prototype.draw = function(x, y, width, height){
 
     if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
     {
-      child.draw(childOffsetX, childOffsetY, childWidth, contentHeight - offsetY);
+      child.draw(parentX, parentY + offsetY, parentWidth, childHeight);
     } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
-      child.draw(childOffsetX, childOffsetY, contentWidth - offsetX, childHeight);
+      child.draw(parentX + offsetX, parentY, childWidth, parentHeight);
     }
 
     if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
