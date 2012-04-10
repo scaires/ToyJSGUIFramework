@@ -30,8 +30,8 @@ LayoutA = {
   name : "layout1",
   klass : "GUILayout",
   backgroundColor : "rgba(50, 50, 50, 0.1)",
-  layout_width : "50pc",
-  layout_height : "50pc",
+  layout_width : "wrap_content",
+  layout_height : "fill_parent",
   layout_gravity : "GUI_LAYOUT_GRAVITY_CENTER",
   layout_children : [
     {
@@ -39,14 +39,14 @@ LayoutA = {
       klass : "GUIView",
       backgroundColor : "rgb(0, 0, 130)",
       layout_width : "25pc",
-      layout_height : "fill_parent",
+      layout_height : "100",
       layout_gravity : "GUI_LAYOUT_GRAVITY_RIGHT"
     },
     {
       name : "view3",
       klass : "GUIView",
       backgroundColor : "rgb(0, 130, 0)",
-      layout_width : "fill_parent",
+      layout_width : "100",
       layout_height : "25pc",
       layout_gravity : "GUI_LAYOUT_GRAVITY_TOP"
     },
@@ -55,24 +55,24 @@ LayoutA = {
       klass : "GUIView",
       backgroundColor : "rgb(130, 0, 0)",
       layout_width : "25pc",
-      layout_height : "fill_parent",
+      layout_height : "100",
       layout_gravity : "GUI_LAYOUT_GRAVITY_LEFT"
     },
     {
       name : "view4",
       klass : "GUIView",
       backgroundColor : "rgb(130, 130, 0)",
-      layout_width : "fill_parent",
+      layout_width : "100",
       layout_height : "25pc",
       layout_gravity : "GUI_LAYOUT_GRAVITY_BOTTOM"
     },
     {
       name : "view5",
       klass : "GUIView",
-      backgroundColor : "rgb(0, 0, 130)",
+      backgroundColor : "rgb(130, 130, 130)",
       layout_width : "25pc",
       layout_height : "25pc",
-      layout_gravity : "GUI_LAYOUT_GRAVITY_BOTTOMRIGHT"
+      layout_gravity : "GUI_LAYOUT_GRAVITY_CENTER"
     }
   ]
 }

@@ -247,10 +247,10 @@ GUIView.prototype.inflate = function(viewJSON)
     //pixel width
     if (viewJSON.layout_width.match(/^\d+(px)?$/))
     {
-      this.myWidth = /^\d+/.exec(viewJSON.layout_width)
+      this.myWidth = eval(/^\d+/.exec(viewJSON.layout_width)[0])
     //percent width
     } else if (viewJSON.layout_width.match(/^\d+pc$/)) {
-      this.myWidth = /^\d+/.exec(viewJSON.layout_width)
+      this.myWidth = eval(/^\d+/.exec(viewJSON.layout_width)[0])
       this.isWidthPercent = true;        
     } else if (viewJSON.layout_width === "wrap_content") {
       this.isWidthWrap = true;
@@ -263,10 +263,10 @@ GUIView.prototype.inflate = function(viewJSON)
     //pixel height
     if (viewJSON.layout_height.match(/^\d+(px)?$/))
     {
-      this.myHeight = /^\d+/.exec(viewJSON.layout_height)
+      this.myHeight = eval(/^\d+/.exec(viewJSON.layout_height)[0])
     //percent height
     } else if (viewJSON.layout_height.match(/^\d+pc$/)) {
-      this.myHeight = /^\d+/.exec(viewJSON.layout_height)
+      this.myHeight = eval(/^\d+/.exec(viewJSON.layout_height)[0])
       this.isHeightPercent = true;        
     } else if (viewJSON.layout_height === "wrap_content") {
       this.isHeightWrap = true;
@@ -347,10 +347,10 @@ GUIView.prototype.measureX = function(x, width)
   {
     return width;
   } else if (this.isWidthWrap) {
-    var contentWidth = Math.min(this.measureContentWidth(), width);
+    var contentWidth = Math.min(this.measureContentWidth(x, width), width);
     return contentWidth;
   } else if (this.isWidthPercent) {
-    var contentWidth = Math.min((this.myWidth / 100.0) * (width - x), width);
+    var contentWidth = Math.min((this.myWidth / 100.0) * (width), width);
     return contentWidth;
   } else {
     var contentWidth = Math.min(this.myWidth, width);
@@ -364,10 +364,10 @@ GUIView.prototype.measureY = function(y, height)
   {
     return height;
   } else if (this.isHeightWrap) {
-    var contentHeight = Math.min(this.measureContentHeight(), height);
+    var contentHeight = Math.min(this.measureContentHeight(y, height), height);
     return contentHeight;
   } else if (this.isHeightPercent) {
-    var contentHeight = Math.min((this.myHeight / 100.0) * (height - y), height);
+    var contentHeight = Math.min((this.myHeight / 100.0) * (height), height);
     return contentHeight;
   } else {
     var contentHeight = Math.min(this.myHeight, height);
@@ -415,12 +415,22 @@ GUIView.prototype.draw = function(x, y, width, height)
 
 GUIView.prototype.measureContentWidth = function()
 {
-  return 0;
+  if (!this.isWidthPercent && !this.isWidthFill && !this.isWidthWrap)
+  {
+    return this.myWidth;
+  } else {
+    return 0;
+  }
 }
 
 GUIView.prototype.measureContentHeight = function()
 {
-  return 0;
+  if (!this.isHeightPercent && !this.isHeightFill && !this.isHeightWrap)
+  {
+    return this.myHeight;
+  } else {
+    return 0;
+  }
 }
 /* END VIEW */
 
