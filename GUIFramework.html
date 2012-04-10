@@ -8,18 +8,18 @@ var myGUI;
 
 function Init()
 {
-    myGUI = new GUI();
-	myGUI.init(document.getElementById("maincanvas"));
-	var layout = myGUI.inflate(LayoutA);
-	myGUI.setLayout(layout);
+  myGUI = new GUI();
+  myGUI.init(document.getElementById("maincanvas"));
+  var layout = myGUI.inflate(LayoutA);
+  myGUI.setLayout(layout);
 }
 
 function Update()
 {
-	if (myGUI && myGUI.isInitialized())
-	{
-		myGUI.draw();
-	}
+  if (myGUI && myGUI.isInitialized())
+  {
+    myGUI.draw();
+  }
 }
 
 setInterval(Update, 20);
@@ -27,13 +27,47 @@ setInterval(Update, 20);
 /* GUI JSON */
 
 LayoutA = {
-	View : {
-		name : "view1",
-		backgroundColor : "rgb(0, 0, 130, 0)",
-		layout_width : "100px",
-		layout_height : "100px"
-	}
-}		
+  name : "layout1",
+  klass : "GUILayout",
+  backgroundColor : "rgba(50, 50, 50, 0.1)",
+  layout_width : "50pc",
+  layout_height : "50pc",
+  layout_gravity : "GUI_LAYOUT_GRAVITY_CENTER",
+  layout_children : [
+    {
+      name : "view1",
+      klass : "GUIView",
+      backgroundColor : "rgb(0, 0, 130)",
+      layout_width : "25pc",
+      layout_height : "fill_parent",
+      layout_gravity : "GUI_LAYOUT_GRAVITY_RIGHT"
+    },
+    {
+      name : "view2",
+      klass : "GUIView",
+      backgroundColor : "rgb(130, 0, 0)",
+      layout_width : "25pc",
+      layout_height : "fill_parent",
+      layout_gravity : "GUI_LAYOUT_GRAVITY_LEFT"
+    },
+    {
+      name : "view3",
+      klass : "GUIView",
+      backgroundColor : "rgb(0, 130, 0)",
+      layout_width : "fill_parent",
+      layout_height : "25pc",
+      layout_gravity : "GUI_LAYOUT_GRAVITY_TOP"
+    },
+    {
+      name : "view4",
+      klass : "GUIView",
+      backgroundColor : "rgb(0, 0, 0)",
+      layout_width : "fill_parent",
+      layout_height : "25pc",
+      layout_gravity : "GUI_LAYOUT_GRAVITY_BOTTOM"
+    }
+  ]
+}
 
 /* END GUI JSON */
 
