@@ -382,9 +382,9 @@ GUIView.prototype.offsetX = function(x, width)
   {
     return x + ((width - contentWidth)/2);
   } else if (this.myGravity == GUI_LAYOUT_GRAVITY_RIGHT || this.myGravity == GUI_LAYOUT_GRAVITY_TOPRIGHT || this.myGravity == GUI_LAYOUT_GRAVITY_BOTTOMRIGHT) {
-    return x;
-  } else {
     return x + (width - contentWidth);
+  } else {
+    return x;
   }
 }
 
