@@ -38,7 +38,7 @@ LayoutA = {
       name : "layout2",
       klass : "GUILayout",
       backgroundColor : "rgba(130, 130, 130, 0.25)",
-      layout_width : "50%",
+      layout_width : "33%",
       layout_height : "fill_parent",
       layout_gravity : "GUI_LAYOUT_GRAVITY_RIGHT",
       layout_children : [
@@ -79,30 +79,57 @@ LayoutA = {
     {
       name : "layout3",
       klass : "GUILinearLayout",
-      backgroundColor : "rgba(130, 130, 130, 0.75)",
-      layout_width : "50%",
+      backgroundColor : "rgba(130, 130, 130, 0.5)",
+      layout_width : "33%",
       layout_height : "fill_parent",
-      layout_gravity : "GUI_LAYOUT_GRAVITY_LEFT",
-      layout_orientation : "GUI_LAYOUT_ORIENTATION_HORIZONTAL",
+      layout_gravity : "GUI_LAYOUT_GRAVITY_CENTER",
+      layout_orientation : "GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL",
       layout_children : [
         {
           name : "view5",
           klass : "GUIView",
-          backgroundColor : "rgb(130, 130, 130)",
-          layout_width : "100",
+          backgroundColor : "rgba(130, 0, 0, 0.5)",
+          layout_width : "150",
           layout_height : "25%",
           layout_gravity : "GUI_LAYOUT_GRAVITY_CENTER"
         },
         {
           name : "view6",
           klass : "GUIView",
-          backgroundColor : "rgb(130, 130, 130)",
+          backgroundColor : "rgba(0, 0, 130, 0.5)",
           layout_width : "100",
           layout_height : "25%",
-          layout_gravity : "GUI_LAYOUT_GRAVITY_CENTER"
+          layout_gravity : "GUI_LAYOUT_GRAVITY_RIGHT"
         }
       ]
-    }
+    },
+      {
+        name : "layout4",
+        klass : "GUILinearLayout",
+        backgroundColor : "rgba(130, 130, 130, 0.5)",
+        layout_width : "33%",
+        layout_height : "fill_parent",
+        layout_gravity : "GUI_LAYOUT_GRAVITY_LEFT",
+        layout_orientation : "GUI_LINEARLAYOUT_ORIENTATION_VERTICAL",
+        layout_children : [
+          {
+            name : "view7",
+            klass : "GUIView",
+            backgroundColor : "rgba(130, 0, 0, 0.5)",
+            layout_width : "50",
+            layout_height : "25%",
+            layout_gravity : "GUI_LAYOUT_GRAVITY_TOP"
+          },
+          {
+            name : "view8",
+            klass : "GUIView",
+            backgroundColor : "rgba(0, 0, 130, 0.5)",
+            layout_width : "50",
+            layout_height : "25%",
+            layout_gravity : "GUI_LAYOUT_GRAVITY_RIGHT"
+          }
+        ]
+      }
   ]
 }
 
@@ -111,6 +138,6 @@ LayoutA = {
 </script>
 </head>
 <body onload="Init();">
-<canvas id="maincanvas" width="400" height="400"></canvas>
+<canvas id="maincanvas" width="800" height="800"></canvas>
 </body>
 </html>

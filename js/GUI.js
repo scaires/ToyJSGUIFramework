@@ -443,6 +443,12 @@ function GUILayout(gui)
 
 GUILayout.inheritsFrom(GUIView);
 
+GUILayout.prototype.init = function()
+{
+  GUILayout.prototype.parent.init.call(this);
+  this.clear();
+}
+
 GUILayout.prototype.addChild = function(view)
 {
   this.myChildren.push(view);
@@ -516,13 +522,18 @@ GUILayout.prototype.measureContentWidth = function()
 
 //Override
 GUILayout.prototype.draw = function(x, y, width, height){ 
-  GUILayout.prototype.parent.draw.call(this, x, y, width, height);
+  this.drawBG(x, y, width, height);
   for (var i = 0; i < this.myChildren.length; i++) 
   {
     var child = this.myChildren[i];
-    child.draw(GUILayout.prototype.parent.offsetX.call(this, x, width), GUILayout.prototype.parent.offsetY.call(this, y, height), 
-      GUILayout.prototype.parent.measureX.call(this, x, width), GUILayout.prototype.parent.measureY.call(this, y, height));
+    child.draw(this.offsetX(x, width), this.offsetY(y, height), 
+      this.measureX(x, width), this.measureY(y, height));
   }
+}
+
+GUILayout.prototype.drawBG = function(x, y, width, height)
+{
+  GUILayout.prototype.parent.draw.call(this, x, y, width, height);
 }
 /* END LAYOUT */
 
@@ -530,7 +541,7 @@ GUILayout.prototype.draw = function(x, y, width, height){
 function GUILinearLayout(gui)
 {
   this.myGUI = gui;
-  var myOrientation = GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL;
+  this.myOrientation = GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL;
 }
 
 GUILinearLayout.inheritsFrom(GUILayout);
@@ -549,7 +560,7 @@ GUILinearLayout.prototype.inflate = function(viewJSON)
   GUILinearLayout.prototype.parent.inflate.call(this, viewJSON);
   if (viewJSON.layout_orientation)
   {
-    this.setOrientation(viewJSON.layout_orientation);
+    this.setOrientation(eval(viewJSON.layout_orientation));
   }
 }
 
@@ -593,44 +604,76 @@ GUILinearLayout.prototype.measureContentWidth = function()
 
 //Override
 GUILinearLayout.prototype.draw = function(x, y, width, height){ 
-  GUILinearLayout.prototype.parent.draw.call(this, x, y, width, height);
+  GUILinearLayout.prototype.parent.drawBG.call(this, x, y, width, height);
   var offsetX = 0;
   var offsetY = 0;
+
   for (var i = 0; i < this.myChildren.length; i++) 
   {
     var child = this.myChildren[i];
-    var childOffsetX = GUILinearLayout.prototype.parent.offsetX.call(this, x + offsetX, width);
-    var childOffsetY = GUILinearLayout.prototype.parent.offsetY.call(this, y + offsetY, height);
-    var childWidth = GUILinearLayout.prototype.parent.measureX.call(this, x + offsetX, width);
-    var childHeight = GUILinearLayout.prototype.parent.measureY.call(this, y + offsetY, height);
-
-    if (offsetX + childOffsetX + childWidth > width)
+    var childOffsetX;
+    var childOffsetY;
+    var childWidth;
+    var childHeight;
+    var parentX = this.offsetX(x, width);
+    var parentY = this.offsetY(y, height);
+    var parentWidth = this.measureX(x, width);
+    var parentHeight = this.measureY(y, height);
+    if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
     {
-      if (offsetX + childOffsetX < width)
+      var contentHeight = child.measureContentHeight();
+      if (child.isHeightPercent)
       {
-        childWidth = width - (offsetX + childOffsetX);
+        contentHeight = parentHeight;
+      }
+      childOffsetX = parentX;
+      childOffsetY = child.offsetY(parentY + offsetY, child.measureContentHeight());
+      childWidth = parentWidth;
+      childHeight = child.measureY(parentY + offsetY, contentHeight);
+    } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
+      var contentWidth = child.measureContentWidth();
+      if (child.isWidthPercent)
+      {
+        contentWidth = parentWidth;
+      }
+      childOffsetX = child.offsetX(parentX + offsetX, child.measureContentWidth());
+      childOffsetY = parentY;
+      childWidth = child.measureX(parentX + offsetX, contentWidth);
+      childHeight = parentHeight;
+    }
+
+    if (childOffsetX + childWidth > parentX + parentWidth)
+    {
+      if (childOffsetX < parentX + parentWidth)
+      {
+        childWidth = parentX + parentWidth - (childOffsetX);
       } else {
         childWidth = 0;
       }
     }
 
-    if (offsetY + childOffsetY + childHeight > height)
+    if (childOffsetY + childHeight > parentY + parentHeight)
     {
-      if (offsetY + childOffsetY < height)
+      if (childOffsetY < parentY + parentHeight)
       {
-        childHeight = height - (offsetY + childOffsetY);
+        childHeight = parentY + parentHeight - (childOffsetY);
       } else {
         childHeight = 0;
       }
     }
 
-    child.draw(childOffsetX, childOffsetY, childWidth, childHeight);
+    if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
+    {
+      child.draw(childOffsetX, childOffsetY, childWidth, contentHeight);
+    } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
+      child.draw(childOffsetX, childOffsetY, contentWidth, childHeight);
+    }
 
     if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
     {
-      offsetX = offsetX + childWidth;
-    } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
       offsetY = offsetY + childHeight;
+    } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
+      offsetX = offsetX + childWidth;
     }
   }
 }
