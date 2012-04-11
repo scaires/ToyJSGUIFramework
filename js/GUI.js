@@ -189,6 +189,11 @@ function GUI()
     }
     myContext.fillText(text, correctedX, correctedY, maxWidth);
   }
+
+  this.drawImage = function(image, x, y, width, height)
+  {
+    myContext.drawImage(image, x, y, width, height);
+  }
   
   this.onMouseDown = function (x, y)
   {
@@ -775,6 +780,97 @@ GUITextView.prototype.draw = function(x, y, width, height)
 }
 
 /* END TEXTVIEW */
+
+/* IMAGEVIEW */
+function GUIImageView(gui)
+{
+  this.myGUI = gui;
+  this.isLoaded = false;
+  this.myImageSrc = "";
+  this.myImage;
+}
+GUIImageView.inheritsFrom(GUIView);
+
+GUIImageView.prototype.init = function()
+{
+  GUIImageView.prototype.parent.init.call(this);
+  this.myBackgroundColor = "rgba(0,0,0,0)";
+  this.isLoaded = false;
+  this.myImageSrc = "";
+  this.myImage = new Image();
+
+  //closure allows onload callback
+  var myImage = this;
+  this.myImage.onload = function() {myImage.onLoad()};
+}
+
+//Override
+GUIImageView.prototype.inflate = function(viewJSON)
+{
+  GUIImageView.prototype.parent.inflate.call(this, viewJSON);
+  if (viewJSON.image_src) 
+  {
+    this.setImageSrc(viewJSON.image_src);
+  }
+}
+
+GUIImageView.prototype.setImageSrc = function(path)
+{
+  this.myImageSrc = path;
+  this.myImage.src = path;
+}
+
+GUIImageView.prototype.loaded = function()
+{
+  if (this.isLoaded)
+  {
+    return this.myImage.complete;
+  } else {
+    return this.isLoaded;
+  }
+}
+
+GUIImageView.prototype.onLoad = function()
+{
+  this.isLoaded = true;
+  return true;
+}
+
+//Override
+GUIImageView.prototype.measureContentWidth = function()
+{
+  if (this.loaded())
+  {
+    return Math.min(this.myPadding * 2 + this.myImage.width, 
+      GUIImageView.prototype.parent.measureContentWidth.call(this));
+  } else {
+    return GUIImageView.prototype.parent.measureContentWidth.call(this);
+  }
+}
+
+//Override
+GUITextView.prototype.measureContentHeight = function()
+{
+  if (this.loaded())
+  {
+    return Math.min(this.myPadding * 2 + this.myImage.height, 
+      GUIImageView.prototype.parent.measureContentHeight.call(this));
+  } else {
+    return GUIImageView.prototype.parent.measureContentHeight.call(this);
+  }
+}
+
+//Override
+GUIImageView.prototype.draw = function(x, y, width, height)
+{
+  GUIImageView.prototype.parent.draw.call(this, x, y, width, height);
+  if (this.loaded())
+  {
+    this.myGUI.drawImage(this.myImage, x + this.myPadding, y + this.myPadding, width - this.myPadding*2, height - this.myPadding*2);
+  }
+}
+
+/* END IMAGEVIEW */
 
 /* BUTTONVIEW */
 function GUIButtonView(gui)

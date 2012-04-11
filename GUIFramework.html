@@ -10,7 +10,7 @@ function Init()
 {
   myGUI = new GUI();
   myGUI.init(document.getElementById("maincanvas"));
-  var layout = myGUI.inflate(LayoutA);
+  var layout = myGUI.inflate(LayoutB);
   myGUI.setLayout(layout);
 }
 
@@ -25,6 +25,18 @@ function Update()
 setInterval(Update, 20);
 
 /* GUI JSON */
+LayoutB = {
+  name : "menuLayout",
+  klass : "GUILayout",
+  backgroundColor : "rgba(0,0,0,0.5)",
+  layout_width : "fill_parent",
+  layout_height : "fill_parent",
+  borderColor : "rgb(0,0,0)",
+  borderSize : "10px",
+  layout_children : [
+    //
+  ]
+}
 
 LayoutA = {
   name : "layout1",

@@ -1,0 +1,54 @@
+<html>
+<head>
+<title>NS2 Main Menu</title>
+<script type='text/javascript' src='js/GUI.js'></script>
+<script type="text/javascript">
+
+var myGUI;
+
+function Init()
+{
+  myGUI = new GUI();
+  myGUI.init(document.getElementById("maincanvas"));
+  var layout = myGUI.inflate(LayoutB);
+  myGUI.setLayout(layout);
+}
+
+function Update()
+{
+  if (myGUI && myGUI.isInitialized())
+  {
+    myGUI.draw();
+  }
+}
+
+setInterval(Update, 20);
+
+/* GUI JSON */
+LayoutB = {
+  name : "menuLayout",
+  klass : "GUILayout",
+  backgroundColor : "rgba(0,0,0,0.5)",
+  layout_width : "fill_parent",
+  layout_height : "fill_parent",
+  borderColor : "rgb(0,0,0)",
+  borderSize : "10px",
+  layout_children : [
+    {
+      name : "bgImg",
+      klass : "GUIImageView",
+      layout_width : "fill_parent",
+      layout_height : "fill_parent",
+      image_src : "img/nsbg.png"
+    }
+  ]
+}
+
+/* END GUI JSON */
+
+</script>
+</head>
+<body onload="Init();">
+<canvas id="maincanvas" width="1280" height="800"></canvas>
+</body>
+</html>
