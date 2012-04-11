@@ -123,6 +123,11 @@ function GUI()
     return undefined;
   }
 
+  this.getContext = function()
+  {
+    return myContext;
+  }
+
   this.getCanvas = function()
   {
     return myCanvas;
@@ -152,7 +157,7 @@ function GUI()
     myContext.clearRect(x, y, width, height);
   }
   
-  this.drawRect = function(x, y, width, height, filled, color)
+  this.drawRect = function(x, y, width, height, filled, color, borderSize)
   {
     if (filled)
     {
@@ -161,8 +166,9 @@ function GUI()
     }
     else
     {
+      myContext.lineWidth = borderSize;
       myContext.strokeStyle = color;
-      myContext.strokeRect(x, y, width, height);
+      myContext.strokeRect(x+borderSize/2, y+borderSize/2, width - borderSize, height - borderSize);
     }
   }
 
@@ -188,6 +194,19 @@ function GUI()
       correctedY = y + (maxHeight - textSize)/2;
     }
     myContext.fillText(text, correctedX, correctedY, maxWidth);
+  }
+  
+  this.measureText = function(text, textSize, font, bold)
+  {
+    boldText = "";
+    if (bold)
+    {
+      boldText = "bold";
+    }
+    myContext.font = boldText + (textSize.toString() + "px " + font);
+    myContext.textBaseline = "top";
+    var textWidth = myContext.measureText(text).width;
+    return textWidth;
   }
 
   this.drawImage = function(image, x, y, width, height)
@@ -297,7 +316,7 @@ GUIView.prototype.inflate = function(viewJSON)
   }
   if (viewJSON.layout_gravity)
   {
-    this.setGravity(eval(viewJSON.layout_gravity));
+    this.setGravity(viewJSON.layout_gravity);
   }
   if (viewJSON.padding && viewJSON.padding.match(/^\d+(px)?$/))
   {
@@ -370,19 +389,36 @@ GUIView.prototype.setGravity = function(gravity)
 {
   switch(gravity)
   {
-    case GUI_LAYOUT_GRAVITY_CENTER:
-    case GUI_LAYOUT_GRAVITY_TOP:
-    case GUI_LAYOUT_GRAVITY_TOPRIGHT:
-    case GUI_LAYOUT_GRAVITY_RIGHT:
-    case GUI_LAYOUT_GRAVITY_BOTTOMRIGHT:
-    case GUI_LAYOUT_GRAVITY_BOTTOM:
-    case GUI_LAYOUT_GRAVITY_BOTTOMLEFT:
-    case GUI_LAYOUT_GRAVITY_LEFT:
-    case GUI_LAYOUT_GRAVITY_TOPLEFT:
-    {
-      this.myGravity = gravity;
+    case "center":
+      this.myGravity = GUI_LAYOUT_GRAVITY_CENTER;
       break;
-    }
+    case "top":
+      this.myGravity = GUI_LAYOUT_GRAVITY_TOP;
+      break;
+    case "topright":
+      this.myGravity = GUI_LAYOUT_GRAVITY_TOPRIGHT;
+      break;
+    case "right":
+      this.myGravity = GUI_LAYOUT_GRAVITY_RIGHT;
+      break;
+    case "bottomright":
+      this.myGravity = GUI_LAYOUT_GRAVITY_BOTTOMRIGHT;
+      break;
+    case "bottom":
+      this.myGravity = GUI_LAYOUT_GRAVITY_BOTTOM;
+      break;
+    case "bottomleft":
+      this.myGravity = GUI_LAYOUT_GRAVITY_BOTTOMLEFT;
+      break;
+    case "left":
+      this.myGravity = GUI_LAYOUT_GRAVITY_LEFT;
+      break;
+    case "topleft":
+      this.myGravity = GUI_LAYOUT_GRAVITY_TOPLEFT;
+      break;
+    default: 
+      this.myGravity = GUI_LAYOUT_GRAVITY_CENTER;
+      break;
   }
 }
 
@@ -452,10 +488,15 @@ GUIView.prototype.draw = function(x, y, width, height)
   if (this.isVisible)
   {
     this.myGUI.drawRect(this.offsetX(x, width), this.offsetY(y, height), this.measureX(x, width), this.measureY(y, height), true, this.myBackgroundColor);
-    if (this.hasBorder)
-    {
-      this.myGUI.drawRect(this.offsetX(x, width), this.offsetY(y, height), this.measureX(x, width), this.measureY(y, height), false, this.myBorderColor, this.myBorderSize);
-    }
+    GUIView.prototype.drawBorder.call(this, x, y, width, height);
+  }
+}
+
+GUIView.prototype.drawBorder = function(x, y, width, height)
+{
+  if (this.hasBorder)
+  {
+    this.myGUI.drawRect(this.offsetX(x, width), this.offsetY(y, height), this.measureX(x, width), this.measureY(y, height), false, this.myBorderColor, this.myBorderSize);
   }
 }
 
@@ -496,6 +537,7 @@ GUILayout.inheritsFrom(GUIView);
 GUILayout.prototype.init = function()
 {
   GUILayout.prototype.parent.init.call(this);
+  this.myBackgroundColor = "rgba(0,0,0,0)";
   this.clear();
 }
 
@@ -542,33 +584,43 @@ GUILayout.prototype.inflate = function(viewJSON)
 //Override
 GUILayout.prototype.measureContentHeight = function()
 {
-  var height = 0;
-  for (var i = 0; i < this.myChildren.length; i++) 
+  if (this.isHeightWrap)
   {
-    var child = this.myChildren[i];
-    var childHeight = child.measureContentHeight();
-    if (childHeight > height)
+    var height = 0;
+    for (var i = 0; i < this.myChildren.length; i++) 
     {
-      height = childHeight;
+      var child = this.myChildren[i];
+      var childHeight = child.measureContentHeight();
+      if (childHeight > height)
+      {
+        height = childHeight + this.myPadding;
+      }
     }
+    return height + this.myPadding;
+  } else {
+    return GUILayout.prototype.parent.measureContentHeight.call(this);
   }
-  return height;
 }
 
 //Override
 GUILayout.prototype.measureContentWidth = function()
 {
-  var width = 0;
-  for (var i = 0; i < this.myChildren.length; i++) 
-  {
-    var child = this.myChildren[i];
-    var childWidth = child.measureContentWidth();
-    if (childWidth > width)
+  if (this.isWidthWrap)
+  { 
+    var width = 0;
+    for (var i = 0; i < this.myChildren.length; i++) 
     {
-      width = childWidth;
+      var child = this.myChildren[i];
+      var childWidth = child.measureContentWidth();
+      if (childWidth > width)
+      {
+        width = childWidth + this.myPadding;
+      }
     }
+    return width + this.myPadding;
+  } else {
+    return GUILayout.prototype.parent.measureContentWidth.call(this);
   }
-  return width;
 }
 
 //Override
@@ -599,9 +651,14 @@ GUILinearLayout.inheritsFrom(GUILayout);
 
 GUILinearLayout.prototype.setOrientation = function(orientation)
 {
-  if (orientation && orientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL || orientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
+  if (orientation)
   {
-    this.myOrientation = orientation;
+    if (orientation === "vertical")
+    {
+      this.myOrientation = GUI_LINEARLAYOUT_ORIENTATION_VERTICAL;
+    } else if (orientation === "horizontal") {
+      this.myOrientation = GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL;
+    }
   }
 }
 
@@ -611,7 +668,7 @@ GUILinearLayout.prototype.inflate = function(viewJSON)
   GUILinearLayout.prototype.parent.inflate.call(this, viewJSON);
   if (viewJSON.layout_orientation)
   {
-    this.setOrientation(eval(viewJSON.layout_orientation));
+    this.setOrientation(viewJSON.layout_orientation);
   }
 }
 
@@ -625,13 +682,13 @@ GUILinearLayout.prototype.measureContentHeight = function()
     var childHeight = child.measureContentHeight();
     if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
     {
-      height = height + childHeight;
+      height = height + childHeight + this.myPadding;
     } else if (childHeight > height)
     {
-      height = childHeight;
+      height = childHeight + this.myPadding;
     }
   }
-  return height;
+  return height + this.myPadding;
 }
 
 //Override
@@ -644,28 +701,28 @@ GUILinearLayout.prototype.measureContentWidth = function()
     var childWidth = child.measureContentWidth();
     if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL)
     {
-      width = width + childWidth;
+      width = width + childWidth + this.myPadding;
     } else if (childWidth > width)
     {
-      width = childWidth;
+      width = childWidth + this.myPadding;
     }
   }
-  return width;
+  return width + this.myPadding;
 }
 
 //Override
 GUILinearLayout.prototype.draw = function(x, y, width, height){ 
   GUILinearLayout.prototype.parent.drawBG.call(this, x, y, width, height);
-  var offsetX = 0;
-  var offsetY = 0;
+  var offsetX = this.myPadding;
+  var offsetY = this.myPadding;
 
   for (var i = 0; i < this.myChildren.length; i++) 
   {
     var child = this.myChildren[i];
-    var childOffsetX;
-    var childOffsetY;
-    var childWidth;
-    var childHeight;
+    var childOffsetX = 0;
+    var childOffsetY = 0;
+    var childWidth = 0;
+    var childHeight = 0;
     var parentX = this.offsetX(x, width);
     var parentY = this.offsetY(y, height);
     var parentWidth = this.measureX(x, width);
@@ -675,19 +732,19 @@ GUILinearLayout.prototype.draw = function(x, y, width, height){
       childOffsetX = parentX;
       childOffsetY = child.offsetY(parentY + offsetY, child.measureContentHeight());
       childWidth = parentWidth;
-      childHeight = child.measureY(parentY + offsetY, parentHeight - offsetY);
+      childHeight = child.measureY(parentY + offsetY, parentHeight);
     } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
       childOffsetX = child.offsetX(parentX + offsetX, child.measureContentWidth());
       childOffsetY = parentY;
-      childWidth = child.measureX(parentX + offsetX, parentWidth - offsetX);
+      childWidth = child.measureX(parentX + offsetX, parentWidth);
       childHeight = parentHeight;
     }
 
-    if (childOffsetX + childWidth > parentX + parentWidth)
+    if (childOffsetX + childWidth > x + width)
     {
-      if (childOffsetX < parentX + parentWidth)
+      if (childOffsetX < x + width)
       {
-        childWidth = parentX + parentWidth - (childOffsetX);
+        childWidth = x + width - (childOffsetX);
       } else {
         childWidth = 0;
       }
@@ -712,9 +769,9 @@ GUILinearLayout.prototype.draw = function(x, y, width, height){
 
     if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
     {
-      offsetY = offsetY + childHeight;
+      offsetY = offsetY + childHeight + this.myPadding;
     } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
-      offsetX = offsetX + childWidth;
+      offsetX = offsetX + childWidth + this.myPadding;
     }
   }
 }
@@ -726,6 +783,7 @@ function GUITextView(gui)
   this.myGUI = gui;
   this.myText = "";
   this.myTextColor = "rgb(0,0,0)";
+  this.myBackgroundColor = "rgba(0, 0, 0, 0)";
   this.myTextSize = 10;
   this.myFont = "Arial",
   this.isTextBold = false;
@@ -750,9 +808,9 @@ GUITextView.prototype.inflate = function(viewJSON)
     {
       this.myTextSize = eval(viewJSON.isTextBold);
     }
-    if (viewJSON.font)
+    if (viewJSON.textFont)
     {
-      this.myFont = viewJSON.font;
+      this.myFont = viewJSON.textFont;
     }
   }
 }
@@ -760,15 +818,13 @@ GUITextView.prototype.inflate = function(viewJSON)
 //Override
 GUITextView.prototype.measureContentWidth = function()
 {
-  return Math.min(this.myPadding * 2 + myGui.getContext().measureText(this.myText), 
-    GUITextView.prototype.parent.measureContentWidth.call(this));
+  return this.myPadding * 2 + this.myGUI.measureText(this.myText, this.myTextSize, this.myFont, this.isTextBold);
 }
 
 //Override
 GUITextView.prototype.measureContentHeight = function()
 {
-  return Math.min(this.myPadding * 2 + this.myTextSize, 
-    GUITextView.prototype.parent.measureContentHeight.call(this));
+  return this.myPadding * 2 + this.myTextSize;
 }
 
 //Override
@@ -776,7 +832,7 @@ GUITextView.prototype.draw = function(x, y, width, height)
 { 
   GUITextView.prototype.parent.draw.call(this, x, y, width, height);
   this.myGUI.drawText(this.myText, x + this.myPadding, y + this.myPadding, width - this.myPadding*2, height - this.myPadding*2,
-    this.myTextColor, this.myTextSize, this.isTextBold);
+    this.myTextColor, this.myTextSize, this.myFont, this.isTextBold);
 }
 
 /* END TEXTVIEW */
@@ -841,20 +897,18 @@ GUIImageView.prototype.measureContentWidth = function()
 {
   if (this.loaded())
   {
-    return Math.min(this.myPadding * 2 + this.myImage.width, 
-      GUIImageView.prototype.parent.measureContentWidth.call(this));
+    return this.myPadding * 2 + this.myImage.width;
   } else {
     return GUIImageView.prototype.parent.measureContentWidth.call(this);
   }
 }
 
 //Override
-GUITextView.prototype.measureContentHeight = function()
+GUIImageView.prototype.measureContentHeight = function()
 {
   if (this.loaded())
   {
-    return Math.min(this.myPadding * 2 + this.myImage.height, 
-      GUIImageView.prototype.parent.measureContentHeight.call(this));
+    return this.myPadding * 2 + this.myImage.height;;
   } else {
     return GUIImageView.prototype.parent.measureContentHeight.call(this);
   }
@@ -866,8 +920,9 @@ GUIImageView.prototype.draw = function(x, y, width, height)
   GUIImageView.prototype.parent.draw.call(this, x, y, width, height);
   if (this.loaded())
   {
-    this.myGUI.drawImage(this.myImage, x + this.myPadding, y + this.myPadding, width - this.myPadding*2, height - this.myPadding*2);
+    this.myGUI.drawImage(this.myImage, this.offsetX(x, width), this.offsetY(y, height), this.measureX(x, width), this.measureY(y, height));
   }
+  this.drawBorder(x, y, width, height);
 }
 
 /* END IMAGEVIEW */
