@@ -193,7 +193,10 @@ function GUI()
     {
       correctedY = y + (maxHeight - textSize)/2;
     }
-    myContext.fillText(text, correctedX, correctedY, maxWidth);
+    if (maxWidth > 0) 
+    {
+      myContext.fillText(text, correctedX, correctedY, maxWidth);
+    }
   }
   
   this.measureText = function(text, textSize, font, bold)

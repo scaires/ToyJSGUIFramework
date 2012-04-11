@@ -70,15 +70,15 @@ LayoutB = {
               layout_gravity : "top",
               layout_orientation : "horizontal",
               backgroundColor : "rgba(0,0,0,0)",
-              padding : "10px",
+              padding : "15px",
               layout_children : [
                 //join button
                 {
                   klass : "GUILayout",
-                  layout_width : "10%",
+                  layout_width : "wrap_content",
                   layout_height : "wrap_content",
                   layout_gravity : "left", 
-                  backgroundColor : "rgba(0,0,0,0.75)",
+                  backgroundColor : "rgba(16,16,16,0.95)",
                   layout_children : [
                     {
                       klass : "GUILinearLayout",
@@ -88,7 +88,7 @@ LayoutB = {
                       layout_children : [
                         {
                           klass : "GUIImageView",
-                          layout_width : "fill_parent",
+                          layout_width : "wrap_content",
                           layout_height : "wrap_content",
                           image_src : "img/ns2joinbutton.png"
                         },
@@ -119,10 +119,10 @@ LayoutB = {
                 //create button
                 {
                   klass : "GUILayout",
-                  layout_width : "10%",
+                  layout_width : "wrap_content",
                   layout_height : "wrap_content",
                   layout_gravity : "left",
-                  backgroundColor : "rgba(0,0,0,0.75)",
+                  backgroundColor : "rgba(16,16,16,0.95)",
                   layout_children : [
                     {
                       klass : "GUILinearLayout",
@@ -163,10 +163,10 @@ LayoutB = {
                 //options button
                 {
                   klass : "GUILayout",
-                  layout_width : "10%",
+                  layout_width : "wrap_content",
                   layout_height : "wrap_content",
                   layout_gravity : "left",
-                  backgroundColor : "rgba(0,0,0,0.75)",
+                  backgroundColor : "rgba(16,16,16,0.95)",
                   layout_children : [
                     {
                       klass : "GUILinearLayout",
@@ -207,10 +207,10 @@ LayoutB = {
                 //exit button
                 {
                   klass : "GUILayout",
-                  layout_width : "10%",
+                  layout_width : "wrap_content",
                   layout_height : "wrap_content",
                   layout_gravity : "left",           
-                  backgroundColor : "rgba(0,0,0,0.75)",
+                  backgroundColor : "rgba(16,16,16,0.95)",
                   layout_children : [
                     {
                       klass : "GUILinearLayout",
@@ -285,7 +285,7 @@ LayoutB = {
         },
         {
           klass : "GUILinearLayout",
-          backgroundColor : "rgba(0, 0, 0, 0)",
+          backgroundColor : "rgba(0, 0, 0, 1)",
           layout_width : "fill_parent",
           layout_height : "6%",
           layout_orientation : "vertical",
@@ -293,7 +293,7 @@ LayoutB = {
           layout_children : [
             {
               klass : "GUITextView",
-              backgroundColor : "rgba(0, 0, 0, 0)",
+              backgroundColor : "rgba(0, 0, 0, 1)",
               padding : "2.5px",
               text : "http://naturalselection2.com",
               textSize : "20px",
@@ -305,7 +305,7 @@ LayoutB = {
             },
             {
               klass : "GUITextView",
-              backgroundColor : "rgba(0, 0, 0, 0)",
+              backgroundColor : "rgba(0, 0, 0, 1)",
               padding : "2.5px",
               text : "Copyright 2010 Unknown Worlds Entertainment, Inc",
               textSize : "20px",
@@ -327,6 +327,6 @@ LayoutB = {
 </script>
 </head>
 <body onload="Init();">
-<canvas id="maincanvas" width="1280" height="800"></canvas>
+<canvas id="maincanvas" width="640" height="480"></canvas>
 </body>
 </html>
