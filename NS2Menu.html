@@ -24,29 +24,34 @@ function Update()
 
 setInterval(Update, 20);
 
-var joinButtonOnMouseDown = function(self, x, y)
-{
-  self.setBackgroundColor("rgb(255,0,0)");
-  return;
-}
-var joinButtonOnMouseUp = function(self, x, y)
-{
-  self.setBackgroundColor("rgb(0,0,0)");
-  return;
-}
 var joinButtonOnMouseClick = function(self, x, y)
 {
-  alert("click!");
+  alert("ERROR: Could not find servers in browser.");
   return;
 }
-var joinButtonOnMouseOver = function(self, x, y)
+var createButtonOnMouseClick = function(self, x, y)
 {
-  self.setBackgroundColor("rgb(0,0,255)");
+  alert("ERROR: Could not find any games to create.");
   return;
 }
-var joinButtonOnMouseOut = function(self, x, y)
+var optionsButtonOnMouseClick = function(self, x, y)
 {
-  self.setBackgroundColor("rgb(0,0,0)");
+  alert("ERROR: Options.xml not found in game directory");
+  return;
+}
+var exitButtonOnMouseClick = function(self, x, y)
+{
+  alert("ERROR: Exit routine terminated.");
+  return;
+}
+var menuButtonOnMouseOver = function(self, x, y)
+{
+  self.setBackgroundColor("#F88017");
+  return;
+}
+var menuButtonOnMouseOut = function(self, x, y)
+{
+  self.setBackgroundColor("rgba(16,16,16,0.95)");
   return;
 }
 
@@ -105,11 +110,8 @@ LayoutB = {
                   layout_height : "wrap_content",
                   layout_gravity : "left", 
                   background_color : "rgba(16,16,16,0.95)",
-                  on_mouse_down : "joinButtonOnMouseDown",
-                  on_mouse_up : "joinButtonOnMouseUp",
-                  on_mouse_click : "joinButtonOnMouseClick",
-                  on_mouse_over : "joinButtonOnMouseOver",
-                  on_mouse_out : "joinButtonOnMouseOut",
+                  on_mouse_over : "menuButtonOnMouseOver",
+                  on_mouse_out : "menuButtonOnMouseOut",
                   layout_children : [
                     {
                       klass : "GUILinearLayout",
@@ -136,14 +138,14 @@ LayoutB = {
                         }
                       ]
                     },
-                    //grey border
                     {
-                      klass : "GUIView",
+                      klass : "GUIButtonView",
                       layout_width : "fill_parent",
                       layout_height : "fill_parent",
                       background_color : "rgba(0,0,0,0)",
                       border_color : "rgba(100,100,100,0.5)",
-                      borderSize : "2px"
+                      borderSize : "2px",
+                      on_mouse_click : "joinButtonOnMouseClick"
                     }
                   ]
                 },
@@ -154,6 +156,8 @@ LayoutB = {
                   layout_height : "wrap_content",
                   layout_gravity : "left",
                   background_color : "rgba(16,16,16,0.95)",
+                  on_mouse_over : "menuButtonOnMouseOver",
+                  on_mouse_out : "menuButtonOnMouseOut",
                   layout_children : [
                     {
                       klass : "GUILinearLayout",
@@ -180,14 +184,14 @@ LayoutB = {
                         }
                       ]
                     },
-                    //grey border
                     {
-                      klass : "GUIView",
+                      klass : "GUIButtonView",
                       layout_width : "fill_parent",
                       layout_height : "fill_parent",
                       background_color : "rgba(0,0,0,0)",
                       border_color : "rgba(100,100,100,0.5)",
-                      borderSize : "2px"
+                      borderSize : "2px",
+                      on_mouse_click : "createButtonOnMouseClick"
                     }
                   ]
                 },
@@ -198,6 +202,8 @@ LayoutB = {
                   layout_height : "wrap_content",
                   layout_gravity : "left",
                   background_color : "rgba(16,16,16,0.95)",
+                  on_mouse_over : "menuButtonOnMouseOver",
+                  on_mouse_out : "menuButtonOnMouseOut",
                   layout_children : [
                     {
                       klass : "GUILinearLayout",
@@ -224,14 +230,14 @@ LayoutB = {
                         }
                       ]
                     },
-                    //grey border
                     {
-                      klass : "GUIView",
+                      klass : "GUIButtonView",
                       layout_width : "fill_parent",
                       layout_height : "fill_parent",
                       background_color : "rgba(0,0,0,0)",
                       border_color : "rgba(100,100,100,0.5)",
-                      borderSize : "2px"
+                      borderSize : "2px",
+                      on_mouse_click : "optionsButtonOnMouseClick"
                     }
                   ]
                 },
@@ -242,6 +248,8 @@ LayoutB = {
                   layout_height : "wrap_content",
                   layout_gravity : "left",           
                   background_color : "rgba(16,16,16,0.95)",
+                  on_mouse_over : "menuButtonOnMouseOver",
+                  on_mouse_out : "menuButtonOnMouseOut",
                   layout_children : [
                     {
                       klass : "GUILinearLayout",
@@ -268,14 +276,14 @@ LayoutB = {
                         }
                       ]
                     },
-                    //grey border
                     {
-                      klass : "GUIView",
+                      klass : "GUIButtonView",
                       layout_width : "fill_parent",
                       layout_height : "fill_parent",
                       background_color : "rgba(0,0,0,0)",
                       border_color : "rgba(100,100,100,0.5)",
-                      borderSize : "2px"
+                      borderSize : "2px",
+                      on_mouse_click : "exitButtonOnMouseClick"
                     }
                   ]
                 }

@@ -443,7 +443,6 @@ GUIView.prototype.didMouseDown = function(eventX, eventY)
 {
   if (this.myMouseDownListener)
   {
-    var self = this;
     var fn = eval(this.myMouseDownListener);
     fn(this, eventX, eventY);
   }
@@ -453,7 +452,6 @@ GUIView.prototype.didMouseUp = function(eventX, eventY)
 {
   if (this.myMouseUpListener)
   {
-    var self = this;
     var fn = eval(this.myMouseUpListener);
     fn(this, eventX, eventY);
   }
@@ -463,7 +461,6 @@ GUIView.prototype.didMouseOver = function(eventX, eventY)
 {
   if (this.myMouseOverListener)
   {
-    var self = this;
     var fn = eval(this.myMouseOverListener);
     fn(this, eventX, eventY);
   }
@@ -473,7 +470,6 @@ GUIView.prototype.didMouseOut = function(eventX, eventY)
 {
   if (this.myMouseOutListener)
   {
-    var self = this;
     var fn = eval(this.myMouseOutListener);
     fn(this, eventX, eventY);
   }
@@ -483,7 +479,6 @@ GUIView.prototype.didMouseClick = function(eventX, eventY)
 {
   if (this.myMouseClickListener)
   {
-    var self = this;
     var fn = eval(this.myMouseClickListener);
     fn(this, eventX, eventY);
   }
@@ -528,6 +523,11 @@ GUIView.prototype.setName = function(name)
 GUIView.prototype.getName = function()
 {
   return this.myName;
+}
+
+GUIView.prototype.setVisible = function(visible)
+{
+  this.isVisible = visible;
 }
 
 GUIView.prototype.setBackgroundColor = function(color)
@@ -649,7 +649,7 @@ GUIView.prototype.draw = function(x, y, width, height)
   if (this.isVisible)
   {
     this.myGUI.drawRect(this.offsetX(x, width), this.offsetY(y, height), this.measureX(x, width), this.measureY(y, height), true, this.myBackgroundColor);
-    GUIView.prototype.drawBorder.call(this, x, y, width, height);
+    this.drawBorder(x, y, width, height);
   }
 }
 
@@ -743,9 +743,10 @@ GUILayout.prototype.onMouseDown = function(eventX, eventY, parentX, parentY, par
     var myY = this.offsetY(parentY, parentHeight);
     var myWidth = this.measureX(parentX, parentWidth);
     var myHeight = this.measureY(parentY, parentHeight);
-    if (child.testBounds(eventX, eventY, myX, myY, myWidth, myHeight))
+    rect = this.childRect(myX, myY, myWidth, myHeight, i);
+    if (child.testBounds(eventX, eventY, rect.x, rect.y, rect.width, rect.height))
     {
-      child.onMouseDown(eventX, eventY, myX, myY, myWidth, myHeight);
+      child.onMouseDown(eventX, eventY, rect.x, rect.y, rect.width, rect.height);
     }
   }
 }
@@ -761,9 +762,10 @@ GUILayout.prototype.onMouseUp = function(eventX, eventY, parentX, parentY, paren
     var myY = this.offsetY(parentY, parentHeight);
     var myWidth = this.measureX(parentX, parentWidth);
     var myHeight = this.measureY(parentY, parentHeight);
-    if (child.testBounds(eventX, eventY, myX, myY, myWidth, myHeight))
+    rect = this.childRect(myX, myY, myWidth, myHeight, i);
+    if (child.testBounds(eventX, eventY, rect.x, rect.y, rect.width, rect.height))
     {
-      child.onMouseUp(eventX, eventY, myX, myY, myWidth, myHeight);
+      child.onMouseUp(eventX, eventY, rect.x, rect.y, rect.width, rect.height);
     }
   }
 }
@@ -779,9 +781,10 @@ GUILayout.prototype.onMouseMove = function(eventX, eventY, parentX, parentY, par
     var myY = this.offsetY(parentY, parentHeight);
     var myWidth = this.measureX(parentX, parentWidth);
     var myHeight = this.measureY(parentY, parentHeight);
-    if (myGUI.isMouseOverView(child) || child.testBounds(eventX, eventY, myX, myY, myWidth, myHeight))
+    rect = this.childRect(myX, myY, myWidth, myHeight, i);
+    if (myGUI.isMouseOverView(child) || child.testBounds(eventX, eventY, rect.x, rect.y, rect.width, rect.height))
     {
-      child.onMouseMove(eventX, eventY, myX, myY, myWidth, myHeight);
+      child.onMouseMove(eventX, eventY, rect.x, rect.y, rect.width, rect.height);
     }
   }
 }
@@ -846,14 +849,28 @@ GUILayout.prototype.measureContentWidth = function()
   }
 }
 
+GUILayout.prototype.childRect = function(x, y, width, height, index)
+{
+  var rect = {
+      x : this.offsetX(x, width), 
+      y : this.offsetY(y, height), 
+      width : this.measureX(x, width), 
+      height : this.measureY(y, height)
+  };
+  return rect;
+}
+
 //Override
 GUILayout.prototype.draw = function(x, y, width, height){ 
   this.drawBG(x, y, width, height);
   for (var i = 0; i < this.myChildren.length; i++) 
   {
     var child = this.myChildren[i];
-    child.draw(this.offsetX(x, width), this.offsetY(y, height), 
-      this.measureX(x, width), this.measureY(y, height));
+    if (child.isVisible) 
+    {
+      rect = this.childRect(x, y, width, height, i);
+      child.draw(rect.x, rect.y, rect.width, rect.height);
+    }
   }
 }
 
@@ -943,9 +960,9 @@ GUILinearLayout.prototype.measureContentWidth = function()
   }
 }
 
-//Override
-GUILinearLayout.prototype.draw = function(x, y, width, height){ 
-  GUILinearLayout.prototype.parent.drawBG.call(this, x, y, width, height);
+//override
+GUILinearLayout.prototype.childRect = function(x, y, width, height, index)
+{
   var offsetX = this.myPadding;
   var offsetY = this.myPadding;
 
@@ -993,11 +1010,30 @@ GUILinearLayout.prototype.draw = function(x, y, width, height){
       }
     }
 
-    if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
+    if (child.isVisible) 
     {
-      child.draw(parentX, parentY + offsetY, parentWidth, childHeight);
-    } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
-      child.draw(parentX + offsetX, parentY, childWidth, parentHeight);
+      if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
+      {
+        if (index == i)
+        {
+          return {
+            x : parentX,
+            y : parentY + offsetY,
+            width : parentWidth,
+            height : childHeight
+          }
+        }
+      } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
+        if (index == i)
+        {
+          return {
+            x : parentX + offsetX,
+            y : parentY,
+            width : childWidth,
+            height : parentHeight
+          }
+        }
+      }
     }
 
     if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
@@ -1008,6 +1044,22 @@ GUILinearLayout.prototype.draw = function(x, y, width, height){
     }
   }
 }
+
+//Override
+GUILinearLayout.prototype.draw = function(x, y, width, height){ 
+  GUILinearLayout.prototype.parent.drawBG.call(this, x, y, width, height);
+
+  for (var i = 0; i < this.myChildren.length; i++) 
+  {
+    var child = this.myChildren[i];
+    if (child.isVisible) 
+    {
+      rect = this.childRect(x, y, width, height, i);
+      child.draw(rect.x, rect.y, rect.width, rect.height);
+    }
+  }
+}
+
 /* END LINEARLAYOUT */
 
 /* TEXTVIEW */
@@ -1164,8 +1216,58 @@ GUIImageView.prototype.draw = function(x, y, width, height)
 function GUIButtonView(gui)
 {
   this.myGUI = gui;
+  this.depressed = false;
+  this.mouseOver = false;
+  this.showMouseOver = true;
+  this.showMouseDown = true;
 }
 GUIButtonView.inheritsFrom(GUITextView);
+
+//Override
+GUIButtonView.prototype.inflate = function(viewJSON)
+{
+  GUIButtonView.prototype.parent.inflate.call(this, viewJSON);
+  if (viewJSON.show_mouse_over) 
+  {
+    this.showMouseOver = eval(viewJSON.show_mouse_over);
+  }
+  if (viewJSON.show_mouse_down) 
+  {
+    this.showMouseDown = eval(viewJSON.show_mouse_down);
+  }
+}
+
+GUIButtonView.prototype.didMouseDown = function(eventX, eventY)
+{
+  this.depressed = true;
+}
+
+GUIButtonView.prototype.didMouseUp = function(eventX, eventY)
+{
+  this.depressed = false;
+}
+
+GUIButtonView.prototype.didMouseOver = function(eventX, eventY)
+{
+  this.mouseOver = true;
+}
+
+GUIButtonView.prototype.didMouseOut = function(eventX, eventY)
+{
+  this.mouseOver = false;
+}
+
+GUIButtonView.prototype.draw = function(x, y, width, height)
+{
+  GUIButtonView.prototype.parent.draw.call(this, x, y, width, height);
+  if (this.depressed && this.showMouseDown)
+  {
+    this.myGUI.drawRect(this.offsetX(x, width), this.offsetY(y, height), this.measureX(x, width), this.measureY(y, height), true, "rgba(0,0,0,0.1)");
+  } else if (this.mouseOver && this.showMouseOver) {
+    this.myGUI.drawRect(this.offsetX(x, width), this.offsetY(y, height), this.measureX(x, width), this.measureY(y, height), true, "rgba(255,255,255,0.1)");
+  }
+  this.drawBorder(x, y, width, height);
+}
 /* END BUTTONVIEW */
 
 /* CHECKBOX */
