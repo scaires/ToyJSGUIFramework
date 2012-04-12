@@ -678,39 +678,49 @@ GUILinearLayout.prototype.inflate = function(viewJSON)
 //Override
 GUILinearLayout.prototype.measureContentHeight = function()
 {
-  var height = 0;
-  for (var i = 0; i < this.myChildren.length; i++) 
+  if (this.isHeightWrap)
   {
-    var child = this.myChildren[i];
-    var childHeight = child.measureContentHeight();
-    if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
+    var height = 0;
+    for (var i = 0; i < this.myChildren.length; i++) 
     {
-      height = height + childHeight + this.myPadding;
-    } else if (childHeight > height)
-    {
-      height = childHeight + this.myPadding;
+      var child = this.myChildren[i];
+      var childHeight = child.measureContentHeight();
+      if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
+      {
+        height = height + childHeight + this.myPadding;
+      } else if (childHeight > height)
+      {
+        height = childHeight + this.myPadding;
+      }
     }
+    return height + this.myPadding;
+  } else {
+    return GUILinearLayout.prototype.parent.measureContentHeight.call(this);
   }
-  return height + this.myPadding;
 }
 
 //Override
 GUILinearLayout.prototype.measureContentWidth = function()
 {
-  var width = 0;
-  for (var i = 0; i < this.myChildren.length; i++) 
+  if (this.isWidthWrap)
   {
-    var child = this.myChildren[i];
-    var childWidth = child.measureContentWidth();
-    if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL)
+    var width = 0;
+    for (var i = 0; i < this.myChildren.length; i++) 
     {
-      width = width + childWidth + this.myPadding;
-    } else if (childWidth > width)
-    {
-      width = childWidth + this.myPadding;
+      var child = this.myChildren[i];
+      var childWidth = child.measureContentWidth();
+      if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL)
+      {
+        width = width + childWidth + this.myPadding;
+      } else if (childWidth > width)
+      {
+        width = childWidth + this.myPadding;
+      }
     }
+    return width + this.myPadding;
+  } else {
+    return GUILinearLayout.prototype.parent.measureContentWidth.call(this);
   }
-  return width + this.myPadding;
 }
 
 //Override
