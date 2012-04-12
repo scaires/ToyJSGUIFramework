@@ -404,13 +404,12 @@ GUIView.prototype.inflate = function(viewJSON)
 }
 
 //event handling
+//only override if the parent dimensions are necessary (for example, layouts testing children)
 GUIView.prototype.onMouseDown = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
 {
-  if (this.myMouseDownListener && this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
+  if (this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
   {
-    var self = this;
-    var fn = eval(this.myMouseDownListener);
-    fn(this, eventX, eventY);
+    this.didMouseDown(eventX, eventY);
   }
 }
 
@@ -418,17 +417,10 @@ GUIView.prototype.onMouseUp = function(eventX, eventY, parentX, parentY, parentW
 {
   if (this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
   {
-    if (this.myMouseUpListener)
+    this.didMouseUp(eventX, eventY);
+    if (myGUI.isMouseOverView(this))
     {
-      var self = this;
-      var fn = eval(this.myMouseUpListener);
-      fn(this, eventX, eventY);
-    }
-    if (myGUI.isMouseOverView(this) && this.myMouseClickListener)
-    {
-      var self = this;
-      var fn = eval(this.myMouseClickListener);
-      fn(this, eventX, eventY);
+      this.didMouseClick(eventX, eventY);
     }
   }
 }
@@ -438,21 +430,62 @@ GUIView.prototype.onMouseMove = function(eventX, eventY, parentX, parentY, paren
   if (this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
   {
     myGUI.registerMouseOverView(this);
-    if (this.myMouseOverListener)
-    {
-      var self = this;
-      var fn = eval(this.myMouseOverListener);
-      fn(this, eventX, eventY);
-    }
+    this.didMouseOver(eventX, eventY);
   } else if (myGUI.isMouseOverView(this) && 
     !this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight)) {
     myGUI.deregisterMouseOverView(this);
-    if (this.myMouseOutListener)
-    {
-      var self = this;
-      var fn = eval(this.myMouseOutListener);
-      fn(this, eventX, eventY);
-    }
+    this.didMouseOut(eventX, eventY);
+  }
+}
+
+//override to get basic functionality after the event occurs (for example, a mouseover effect for a button)
+GUIView.prototype.didMouseDown = function(eventX, eventY)
+{
+  if (this.myMouseDownListener)
+  {
+    var self = this;
+    var fn = eval(this.myMouseDownListener);
+    fn(this, eventX, eventY);
+  }
+}
+
+GUIView.prototype.didMouseUp = function(eventX, eventY)
+{
+  if (this.myMouseUpListener)
+  {
+    var self = this;
+    var fn = eval(this.myMouseUpListener);
+    fn(this, eventX, eventY);
+  }
+}
+
+GUIView.prototype.didMouseOver = function(eventX, eventY)
+{
+  if (this.myMouseOverListener)
+  {
+    var self = this;
+    var fn = eval(this.myMouseOverListener);
+    fn(this, eventX, eventY);
+  }
+}
+
+GUIView.prototype.didMouseOut = function(eventX, eventY)
+{
+  if (this.myMouseOutListener)
+  {
+    var self = this;
+    var fn = eval(this.myMouseOutListener);
+    fn(this, eventX, eventY);
+  }
+}
+
+GUIView.prototype.didMouseClick = function(eventX, eventY)
+{
+  if (this.myMouseClickListener)
+  {
+    var self = this;
+    var fn = eval(this.myMouseClickListener);
+    fn(this, eventX, eventY);
   }
 }
 
