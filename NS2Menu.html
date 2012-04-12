@@ -24,14 +24,40 @@ function Update()
 
 setInterval(Update, 20);
 
+var joinButtonOnMouseDown = function(self, x, y)
+{
+  self.setBackgroundColor("rgb(255,0,0)");
+  return;
+}
+var joinButtonOnMouseUp = function(self, x, y)
+{
+  self.setBackgroundColor("rgb(0,0,0)");
+  return;
+}
+var joinButtonOnMouseClick = function(self, x, y)
+{
+  alert("click!");
+  return;
+}
+var joinButtonOnMouseOver = function(self, x, y)
+{
+  self.setBackgroundColor("rgb(0,0,255)");
+  return;
+}
+var joinButtonOnMouseOut = function(self, x, y)
+{
+  self.setBackgroundColor("rgb(0,0,0)");
+  return;
+}
+
 /* GUI JSON */
 LayoutB = {
   name : "menuLayout",
   klass : "GUILayout",
-  backgroundColor : "rgba(0,0,0,0.5)",
+  background_color : "rgba(0,0,0,0.5)",
   layout_width : "fill_parent",
   layout_height : "fill_parent",
-  borderColor : "rgb(0,0,0)",
+  border_color : "rgb(0,0,0)",
   borderSize : "10px",
   layout_children : [
     {
@@ -59,7 +85,7 @@ LayoutB = {
           layout_width : "fill_parent",
           layout_height : "50%",
           layout_gravity : "center",
-          backgroundColor : "rgba(0,0,0,0)",
+          background_color : "rgba(0,0,0,0)",
           layout_children : [
             {
               //button container
@@ -69,7 +95,7 @@ LayoutB = {
               layout_height : "wrap_content",
               layout_gravity : "top",
               layout_orientation : "horizontal",
-              backgroundColor : "rgba(0,0,0,0)",
+              background_color : "rgba(0,0,0,0)",
               padding : "15px",
               layout_children : [
                 //join button
@@ -78,11 +104,16 @@ LayoutB = {
                   layout_width : "wrap_content",
                   layout_height : "wrap_content",
                   layout_gravity : "left", 
-                  backgroundColor : "rgba(16,16,16,0.95)",
+                  background_color : "rgba(16,16,16,0.95)",
+                  on_mouse_down : "joinButtonOnMouseDown",
+                  on_mouse_up : "joinButtonOnMouseUp",
+                  on_mouse_click : "joinButtonOnMouseClick",
+                  on_mouse_over : "joinButtonOnMouseOver",
+                  on_mouse_out : "joinButtonOnMouseOut",
                   layout_children : [
                     {
                       klass : "GUILinearLayout",
-                      layout_width : "10%",
+                      layout_width : "wrap_content",
                       layout_height : "wrap_content",
                       layout_orientation : "vertical",
                       layout_children : [
@@ -110,8 +141,8 @@ LayoutB = {
                       klass : "GUIView",
                       layout_width : "fill_parent",
                       layout_height : "fill_parent",
-                      backgroundColor : "rgba(0,0,0,0)",
-                      borderColor : "rgba(100,100,100,0.5)",
+                      background_color : "rgba(0,0,0,0)",
+                      border_color : "rgba(100,100,100,0.5)",
                       borderSize : "2px"
                     }
                   ]
@@ -122,11 +153,11 @@ LayoutB = {
                   layout_width : "wrap_content",
                   layout_height : "wrap_content",
                   layout_gravity : "left",
-                  backgroundColor : "rgba(16,16,16,0.95)",
+                  background_color : "rgba(16,16,16,0.95)",
                   layout_children : [
                     {
                       klass : "GUILinearLayout",
-                      layout_width : "10%",
+                      layout_width : "wrap_content",
                       layout_height : "wrap_content",
                       layout_orientation : "vertical",
                       layout_children : [
@@ -154,8 +185,8 @@ LayoutB = {
                       klass : "GUIView",
                       layout_width : "fill_parent",
                       layout_height : "fill_parent",
-                      backgroundColor : "rgba(0,0,0,0)",
-                      borderColor : "rgba(100,100,100,0.5)",
+                      background_color : "rgba(0,0,0,0)",
+                      border_color : "rgba(100,100,100,0.5)",
                       borderSize : "2px"
                     }
                   ]
@@ -166,11 +197,11 @@ LayoutB = {
                   layout_width : "wrap_content",
                   layout_height : "wrap_content",
                   layout_gravity : "left",
-                  backgroundColor : "rgba(16,16,16,0.95)",
+                  background_color : "rgba(16,16,16,0.95)",
                   layout_children : [
                     {
                       klass : "GUILinearLayout",
-                      layout_width : "10%",
+                      layout_width : "wrap_content",
                       layout_height : "wrap_content",
                       layout_orientation : "vertical",
                       layout_children : [
@@ -198,8 +229,8 @@ LayoutB = {
                       klass : "GUIView",
                       layout_width : "fill_parent",
                       layout_height : "fill_parent",
-                      backgroundColor : "rgba(0,0,0,0)",
-                      borderColor : "rgba(100,100,100,0.5)",
+                      background_color : "rgba(0,0,0,0)",
+                      border_color : "rgba(100,100,100,0.5)",
                       borderSize : "2px"
                     }
                   ]
@@ -210,11 +241,11 @@ LayoutB = {
                   layout_width : "wrap_content",
                   layout_height : "wrap_content",
                   layout_gravity : "left",           
-                  backgroundColor : "rgba(16,16,16,0.95)",
+                  background_color : "rgba(16,16,16,0.95)",
                   layout_children : [
                     {
                       klass : "GUILinearLayout",
-                      layout_width : "10%",
+                      layout_width : "wrap_content",
                       layout_height : "wrap_content",
                       layout_orientation : "vertical",
                       layout_children : [
@@ -242,8 +273,8 @@ LayoutB = {
                       klass : "GUIView",
                       layout_width : "fill_parent",
                       layout_height : "fill_parent",
-                      backgroundColor : "rgba(0,0,0,0)",
-                      borderColor : "rgba(100,100,100,0.5)",
+                      background_color : "rgba(0,0,0,0)",
+                      border_color : "rgba(100,100,100,0.5)",
                       borderSize : "2px"
                     }
                   ]
@@ -285,7 +316,7 @@ LayoutB = {
         },
         {
           klass : "GUILinearLayout",
-          backgroundColor : "rgba(0, 0, 0, 0)",
+          background_color : "rgba(0, 0, 0, 0)",
           layout_width : "fill_parent",
           layout_height : "6%",
           layout_orientation : "vertical",
@@ -293,7 +324,7 @@ LayoutB = {
           layout_children : [
             {
               klass : "GUITextView",
-              backgroundColor : "rgba(0, 0, 0, 0)",
+              background_color : "rgba(0, 0, 0, 0)",
               padding : "2.5px",
               text : "http://naturalselection2.com",
               textSize : "20px",
@@ -305,7 +336,7 @@ LayoutB = {
             },
             {
               klass : "GUITextView",
-              backgroundColor : "rgba(0, 0, 0, 0)",
+              background_color : "rgba(0, 0, 0, 0)",
               padding : "2.5px",
               text : "Copyright 2010 Unknown Worlds Entertainment, Inc",
               textSize : "20px",

@@ -31,7 +31,7 @@ Function.prototype.inheritsFrom = function( parentClassOrObject ){
     this.prototype.parent = parentClassOrObject;
   } 
   return this;
-} 
+}
 
 /* MOUSE EVENT */
 function GUIMouseEvent(handler, ev)
@@ -60,17 +60,19 @@ function GUI()
   var myCanvas;
   var myViewIndex;
   var myViews;
+  var myMouseOverViewIds;
 
   //privileged
   this.init = function(canvas) 
   {
     myViewIndex = 0;
     myViews = {};
+    myMouseOverViewIds = [];
     myCanvas = canvas;
     myContext = myCanvas.getContext("2d");
-    myCanvas.addEventListener('mousedown',   GUIMouseEvent.bind(null, this.onMouseDown), false);
-    myCanvas.addEventListener('mouseup',  GUIMouseEvent.bind(null, this.onMouseUp), false);
-    myCanvas.addEventListener('mousemove',  GUIMouseEvent.bind(null, this.onMouseMove), false);
+    myCanvas.addEventListener('mousedown',   GUIMouseEvent.bind(this, this.onMouseDown), false);
+    myCanvas.addEventListener('mouseup',  GUIMouseEvent.bind(this, this.onMouseUp), false);
+    myCanvas.addEventListener('mousemove',  GUIMouseEvent.bind(this, this.onMouseMove), false);
     isInitialized = true;
   }
   
@@ -217,18 +219,56 @@ function GUI()
     myContext.drawImage(image, x, y, width, height);
   }
   
+  //event handling
   this.onMouseDown = function (x, y)
   {
+    if (myContext && myLayout)
+    {
+      myLayout.onMouseDown(x, y, 0, 0, myCanvas.width, myCanvas.height);
+    }
   }
 
   this.onMouseUp = function(x, y)
   {
+    if (myContext && myLayout)
+    {
+      myLayout.onMouseUp(x, y, 0, 0, myCanvas.width, myCanvas.height);
+    }
   }
 
   this.onMouseMove = function(x, y)
   {
+    if (myContext && myLayout)
+    {
+      myLayout.onMouseMove(x, y, 0, 0, myCanvas.width, myCanvas.height);
+    }
   }
   
+  this.registerMouseOverView = function(view)
+  {
+    myMouseOverViewIds.push(view.getId());
+  }
+
+  this.deregisterMouseOverView = function(view)
+  {
+    var index = myMouseOverViewIds.indexOf(view.getId());
+    if (index != -1)
+    {
+      myMouseOverViewIds.splice(index, 1);
+    }
+  }
+
+  this.isMouseOverView = function(view)
+  {
+    var index = myMouseOverViewIds.indexOf(view.getId());
+    if (index != -1)
+    {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   //private
   var generateViewId = function()
   {
@@ -261,6 +301,12 @@ function GUIView(gui)
   this.isHeightFill = false;
   this.isHeightWrap = false;
   this.isHeightPercent = false;
+  //event listeners
+  this.myMouseDownListener;
+  this.myMouseUpListener;
+  this.myMouseOverListener;
+  this.myMouseOutListener;
+  this.myMouseClickListener;
 }
 
 GUIView.prototype.init = function()
@@ -275,14 +321,14 @@ GUIView.prototype.inflate = function(viewJSON)
   {
     this.setName(viewJSON.name);
   }
-  if (viewJSON.backgroundColor)
+  if (viewJSON.background_color)
   {
-    this.setBackgroundColor(viewJSON.backgroundColor);
+    this.setBackgroundColor(viewJSON.background_color);
   }
-  if (viewJSON.borderColor && viewJSON.borderSize && viewJSON.borderSize.match(/^\d+(px)?$/))
+  if (viewJSON.border_color && viewJSON.borderSize && viewJSON.borderSize.match(/^\d+(px)?$/))
   {
     this.hasBorder = true;
-    this.myBorderColor = viewJSON.borderColor;
+    this.myBorderColor = viewJSON.border_color;
     this.myBorderSize = eval(/^\d+/.exec(viewJSON.borderSize)[0])
   }
   if (viewJSON.layout_width)
@@ -328,6 +374,85 @@ GUIView.prototype.inflate = function(viewJSON)
   if (viewJSON.layout_margin && viewJSON.layout_margin.match(/^\d+(px)?$/))
   {
     this.myMargin = eval(/^\d+/.exec(viewJSON.layout_margin)[0]);
+  }
+  //TODO: regex to ensure a valid function
+  if (viewJSON.on_mouse_down)
+  {
+    var fnString = viewJSON.on_mouse_down;
+    this.myMouseDownListener = fnString;
+  }
+  if (viewJSON.on_mouse_up)
+  {
+    var fnString = viewJSON.on_mouse_up;
+    this.myMouseUpListener = fnString;
+  }
+  if (viewJSON.on_mouse_over)
+  {
+    var fnString = viewJSON.on_mouse_over;
+    this.myMouseOverListener = fnString;
+  }
+  if (viewJSON.on_mouse_out)
+  {
+    var fnString = viewJSON.on_mouse_out;
+    this.myMouseOutListener = fnString;
+  }
+  if (viewJSON.on_mouse_click)
+  {
+    var fnString = viewJSON.on_mouse_click;
+    this.myMouseClickListener = fnString;
+  }
+}
+
+//event handling
+GUIView.prototype.onMouseDown = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
+{
+  if (this.myMouseDownListener && this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
+  {
+    var self = this;
+    var fn = eval(this.myMouseDownListener);
+    fn(this, eventX, eventY);
+  }
+}
+
+GUIView.prototype.onMouseUp = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
+{
+  if (this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
+  {
+    if (this.myMouseUpListener)
+    {
+      var self = this;
+      var fn = eval(this.myMouseUpListener);
+      fn(this, eventX, eventY);
+    }
+    if (myGUI.isMouseOverView(this) && this.myMouseClickListener)
+    {
+      var self = this;
+      var fn = eval(this.myMouseClickListener);
+      fn(this, eventX, eventY);
+    }
+  }
+}
+
+GUIView.prototype.onMouseMove = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
+{
+  if (this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
+  {
+    myGUI.registerMouseOverView(this);
+    if (this.myMouseOverListener)
+    {
+      var self = this;
+      var fn = eval(this.myMouseOverListener);
+      fn(this, eventX, eventY);
+    }
+  } else if (myGUI.isMouseOverView(this) && 
+    !this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight)) {
+    myGUI.deregisterMouseOverView(this);
+    if (this.myMouseOutListener)
+    {
+      var self = this;
+      var fn = eval(this.myMouseOutListener);
+      fn(this, eventX, eventY);
+    }
   }
 }
 
@@ -526,6 +651,15 @@ GUIView.prototype.measureContentHeight = function()
     return 0;
   }
 }
+
+GUIView.prototype.testBounds = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
+{
+  var myX = this.offsetX(parentX, parentWidth);
+  var myY = this.offsetY(parentY, parentHeight);
+  var myWidth = this.measureX(parentX, parentWidth);
+  var myHeight = this.measureY(parentY, parentHeight);
+  return (eventX >= myX && eventX <= myX + myWidth && eventY >= myY && eventY <= myY + myHeight);
+}
 /* END VIEW */
 
 /* LAYOUT */
@@ -564,6 +698,59 @@ GUILayout.prototype.getChildren = function()
     tempChildren.push(child)
   }
   return tempChildren;
+}
+
+GUILayout.prototype.onMouseDown = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
+{
+  GUILayout.prototype.parent.onMouseDown.call(this, eventX, eventY, parentX, parentY, parentWidth, parentHeight);
+  for (var i = 0; i < this.myChildren.length; i++) 
+  {
+    var child = this.myChildren[i];
+    var myX = this.offsetX(parentX, parentWidth);
+    var myY = this.offsetY(parentY, parentHeight);
+    var myWidth = this.measureX(parentX, parentWidth);
+    var myHeight = this.measureY(parentY, parentHeight);
+    if (child.testBounds(eventX, eventY, myX, myY, myWidth, myHeight))
+    {
+      child.onMouseDown(eventX, eventY, myX, myY, myWidth, myHeight);
+    }
+  }
+}
+
+//unfinished
+GUILayout.prototype.onMouseUp = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
+{
+  GUILayout.prototype.parent.onMouseUp.call(this, eventX, eventY, parentX, parentY, parentWidth, parentHeight);
+  for (var i = 0; i < this.myChildren.length; i++) 
+  {
+    var child = this.myChildren[i];
+    var myX = this.offsetX(parentX, parentWidth);
+    var myY = this.offsetY(parentY, parentHeight);
+    var myWidth = this.measureX(parentX, parentWidth);
+    var myHeight = this.measureY(parentY, parentHeight);
+    if (child.testBounds(eventX, eventY, myX, myY, myWidth, myHeight))
+    {
+      child.onMouseUp(eventX, eventY, myX, myY, myWidth, myHeight);
+    }
+  }
+}
+
+//unfinished
+GUILayout.prototype.onMouseMove = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
+{
+  GUILayout.prototype.parent.onMouseMove.call(this, eventX, eventY, parentX, parentY, parentWidth, parentHeight);
+  for (var i = 0; i < this.myChildren.length; i++) 
+  {
+    var child = this.myChildren[i];
+    var myX = this.offsetX(parentX, parentWidth);
+    var myY = this.offsetY(parentY, parentHeight);
+    var myWidth = this.measureX(parentX, parentWidth);
+    var myHeight = this.measureY(parentY, parentHeight);
+    if (myGUI.isMouseOverView(child) || child.testBounds(eventX, eventY, myX, myY, myWidth, myHeight))
+    {
+      child.onMouseMove(eventX, eventY, myX, myY, myWidth, myHeight);
+    }
+  }
 }
 
 //Override
