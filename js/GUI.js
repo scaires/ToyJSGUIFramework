@@ -183,7 +183,7 @@ function GUI()
     }
     myContext.font = boldText + (textSize.toString() + "px " + font);
     myContext.fillStyle = color;
-    myContext.textBaseline = "top";
+    myContext.textBaseline = "middle";
     var correctedX = x;
     var correctedY = y;
     var textWidth = myContext.measureText(text).width;
@@ -197,7 +197,7 @@ function GUI()
     }
     if (maxWidth > 0) 
     {
-      myContext.fillText(text, correctedX, correctedY, maxWidth);
+      myContext.fillText(text, correctedX, correctedY + maxHeight/2, maxWidth);
     }
   }
   
@@ -325,11 +325,11 @@ GUIView.prototype.inflate = function(viewJSON)
   {
     this.setBackgroundColor(viewJSON.background_color);
   }
-  if (viewJSON.border_color && viewJSON.borderSize && viewJSON.borderSize.match(/^\d+(px)?$/))
+  if (viewJSON.border_color && viewJSON.border_size && viewJSON.border_size.match(/^\d+(px)?$/))
   {
     this.hasBorder = true;
     this.myBorderColor = viewJSON.border_color;
-    this.myBorderSize = eval(/^\d+/.exec(viewJSON.borderSize)[0])
+    this.myBorderSize = eval(/^\d+/.exec(viewJSON.border_size)[0])
   }
   if (viewJSON.layout_width)
   {
@@ -1081,22 +1081,22 @@ GUITextView.prototype.inflate = function(viewJSON)
   if (viewJSON.text) 
   {
     this.myText = viewJSON.text;
-    if (viewJSON.textColor) 
-    {
-      this.myTextColor = viewJSON.textColor;
-    }
-    if (viewJSON.textSize && viewJSON.textSize.match(/^\d+(px)?$/))
-    {
-      this.myTextSize = eval(/^\d+/.exec(viewJSON.textSize)[0])
-    }
-    if (viewJSON.isTextBold && viewJSON.isTextBold === "true" || viewJSON.isTextBold === "false")
-    {
-      this.myTextSize = eval(viewJSON.isTextBold);
-    }
-    if (viewJSON.textFont)
-    {
-      this.myFont = viewJSON.textFont;
-    }
+  }
+  if (viewJSON.textColor) 
+  {
+    this.myTextColor = viewJSON.textColor;
+  }
+  if (viewJSON.textSize && viewJSON.textSize.match(/^\d+(px)?$/))
+  {
+    this.myTextSize = eval(/^\d+/.exec(viewJSON.textSize)[0])
+  }
+  if (viewJSON.isTextBold && viewJSON.isTextBold === "true" || viewJSON.isTextBold === "false")
+  {
+    this.myTextSize = eval(viewJSON.isTextBold);
+  }
+  if (viewJSON.textFont)
+  {
+    this.myFont = viewJSON.textFont;
   }
 }
 
@@ -1116,7 +1116,8 @@ GUITextView.prototype.measureContentHeight = function()
 GUITextView.prototype.draw = function(x, y, width, height)
 { 
   GUITextView.prototype.parent.draw.call(this, x, y, width, height);
-  this.myGUI.drawText(this.myText, x + this.myPadding, y + this.myPadding, width - this.myPadding*2, height - this.myPadding*2,
+  this.myGUI.drawText(this.myText, this.offsetX(x, width) + this.myPadding, this.offsetY(y, height) + this.myPadding, 
+    this.measureX(x, width) - this.myPadding*2, this.measureY(y, height) - this.myPadding*2,
     this.myTextColor, this.myTextSize, this.myFont, this.isTextBold);
 }
 
@@ -1239,22 +1240,31 @@ GUIButtonView.prototype.inflate = function(viewJSON)
 
 GUIButtonView.prototype.didMouseDown = function(eventX, eventY)
 {
+  GUIButtonView.prototype.parent.didMouseDown.call(this,eventX, eventY);
   this.depressed = true;
 }
 
 GUIButtonView.prototype.didMouseUp = function(eventX, eventY)
 {
+  GUIButtonView.prototype.parent.didMouseUp.call(this,eventX, eventY);
   this.depressed = false;
 }
 
 GUIButtonView.prototype.didMouseOver = function(eventX, eventY)
 {
+  GUIButtonView.prototype.parent.didMouseOver.call(this,eventX, eventY);
   this.mouseOver = true;
 }
 
 GUIButtonView.prototype.didMouseOut = function(eventX, eventY)
 {
+  GUIButtonView.prototype.parent.didMouseOut.call(this,eventX, eventY);
   this.mouseOver = false;
+}
+
+GUIButtonView.prototype.didMouseClick = function(eventX, eventY)
+{
+  GUIButtonView.prototype.parent.didMouseClick.call(this,eventX, eventY);
 }
 
 GUIButtonView.prototype.draw = function(x, y, width, height)
@@ -1274,6 +1284,34 @@ GUIButtonView.prototype.draw = function(x, y, width, height)
 function GUICheckBoxView(gui)
 {
   this.myGUI = gui;
+  this.checked = false;
+  this.showMouseOver = false;
+  this.showMouseDown = false;
 }
 GUICheckBoxView.inheritsFrom(GUIButtonView);
+
+GUICheckBoxView.prototype.inflate = function(viewJSON)
+{
+  GUICheckBoxView.prototype.parent.inflate.call(this, viewJSON);
+}
+
+GUICheckBoxView.prototype.didMouseClick = function(eventX, eventY)
+{
+  this.checked = !this.checked;
+}
+
+GUICheckBoxView.prototype.draw = function(x, y, width, height)
+{
+  GUICheckBoxView.prototype.parent.draw.call(this, x, y, width, height);
+  if (this.checked || !this.checked && this.depressed)
+  {
+    this.myGUI.drawText("X", this.offsetX(x, width), this.offsetY(y, height), 
+      this.measureX(x, width), this.measureY(y, height),
+      this.myTextColor, this.measureY(y, height), "Arial", true);
+  } else if (!this.checked || this.checked && this.depressed) {
+    this.myGUI.drawText("X", this.offsetX(x, width), this.offsetY(y, height), 
+      this.measureX(x, width), this.measureY(y, height),
+      "rgba(0,0,0,0)", this.measureY(y, height), "Arial", true);
+  }
+}
 /* END CHECKBOX */
