@@ -71,11 +71,22 @@ var noCheckboxChecked = function(self)
   return;
 }
 
-var onLoad = function()
+var whaleMouseover = function(self)
+{
+  self.setVisible(true);
+}
+
+var whaleMouseout = function(self)
+{
+  self.setVisible(false);
+}
+
+var onLoad = function(self)
 {
   var noCheckbox = self.myGUI.findViewByName("checkboxno");
   noCheckbox.setChecked(true);
-  alert("Loaded!");
+  var whaleLayout = self.myGUI.findViewByName("whaleLayout");
+  whaleLayout.setVisible(false);
 }
 
 /* GUI JSON */
@@ -346,6 +357,7 @@ LayoutB = {
               ]
             },
             {
+              name : "whaleLayout",
               klass : "GUILinearLayout",
               layout_width : "wrap_content",
               layout_height : "wrap_content",
@@ -353,6 +365,8 @@ LayoutB = {
               layout_gravity : "bottom",
               padding : "10px",
               background_color : "rgba(0,0,0,0.5)",
+              on_mouse_over : "whaleMouseover",
+              on_mouse_out : "whaleMouseout",
               layout_children : [
                 {
                   klass : "GUITextView",
@@ -409,7 +423,7 @@ LayoutB = {
                     {
                       name : "textBoxName",
                       klass : "GUITextView",
-                      text : "Y",
+                      text : "Y /",
                       textSize : "20px",
                       textFont : "Arial",
                       textColor : "#FFFFFF",
