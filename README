@@ -1,4 +1,5 @@
 ToyJSGUIFramework
+13/04/2012
 
 by Steve Caires
 steve.caires@gmail.com
@@ -7,7 +8,7 @@ This "Toy" layout system was a project that I used to learn javascript from scra
 
 The goals of the project were:
 1) to define layouts in data structures, not code
-2) to nest views in a heirarchy for event handling, drawing, and positioning
+2) to nest views in a hierarchy for event handling, drawing, and positioning
 3) to draw a single layout at any resolution, by allowing view width and height to depend on absolute pixel measurements, screen percentage, content size or parent size.
 4) to derive complex view classes from simpler ones, to share and override functionality (note: using an emulation of traditional inheritance, which is not a pattern generally used in javascript)
 
@@ -15,7 +16,28 @@ Views are defined as JS objects, with child views nested within the child arrays
 
 After creating a GUI object, initializing with a canvas, inflating and setting the root layout, you are ready to call the gui's "update" function (which performs the draw call) from your setInterval function.
 
-View classes and object properties.
+SimpleMenu.html shows a basic layout and how to initialize it.
+
+Known Issues:
+- Images fill view and do not keep aspect
+- All views under a mouse event are triggered, not just the top one
+- Mouse events are traversed bottom to top instead of top to bottom
+- Some issues with margins, padding, linearlayouts, and content measuring. Can work around these issues by putting a linearlayout inside a normal layout and adding padding or margins to that layout.
+- Linearlayouts currently start drawing/measuring from top left. To center elements inside a linear layout, nest it inside another layout set to wrap content, and give that layout the desired gravity.
+- Multi line text views are not supported.
+- Layout will not load if given bad data in the layout definition; eg, a classname that does not exist.
+- Many properties are defined only in the layout definition and do not have setter/getter methods. All views have properties exposed, so these can be used for reading from or modifying views.
+- OnClick fires for whatever view the mouse is over when it is released, instead of requiring the mouse to be over the same view for the mousedown and mouseup event.
+- Some text may show outside of its view boundary, especially with padding or margins.
+
+Future Plans:
+- Animations
+- Better handling of mouse events (some views "capture" mouse events so they are not propagated to other views)
+- Aspect fit for images
+- Improved measurements / fixed layout bugs
+- Multiline text
+
+Reference: View classes and object properties.
 GUIView
   name : string
   background_color : color string
