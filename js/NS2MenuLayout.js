@@ -236,42 +236,42 @@ LayoutB = {
               ]
             },
             {
-              klass : "GUILayout",
+              klass : "GUILinearLayout",
               layout_width : "wrap_content",
-              layout_height : "fill_parent",
+              layout_height : "20px",
+              layout_orientation : "horizontal",
               layout_gravity : "center",
               layout_children : [
                 {
-                  klass : "GUILinearLayout",
+                  klass : "GUITextView",
+                  text : "Welcome back, ",
+                  textSize : "20px",
+                  textFont : "Arial",
+                  textBold : "true",
+                  textColor : "rgba(255,255,255,1.0)",
                   layout_width : "wrap_content",
-                  layout_height : "20px",
-                  layout_orientation : "horizontal",
-                  layout_gravity : "center",
-                  layout_children : [
-                    {
-                      klass : "GUITextView",
-                      text : "Welcome back, ",
-                      textSize : "20px",
-                      textFont : "Arial",
-                      textBold : "true",
-                      textColor : "rgba(255,255,255,1.0)",
-                      layout_width : "wrap_content",
-                      layout_height : "fill_parent",
-                      layout_gravity : "left"
-                    },
-                    {
-                      name : "textBoxName",
-                      klass : "GUITextView",
-                      text : "[IAM] The Captain",
-                      textSize : "20px",
-                      textFont : "Arial",
-                      textColor : "#F88017",
-                      layout_width : "wrap_content",
-                      layout_height : "fill_parent",
-                      layout_gravity : "left"
-                    }
-                  ]
+                  layout_height : "fill_parent",
+                  layout_gravity : "left"
                 },
+                {
+                  name : "textBoxName",
+                  klass : "GUITextView",
+                  text : "[IAM] The Captain",
+                  textSize : "20px",
+                  textFont : "Arial",
+                  textColor : "#F88017",
+                  layout_width : "wrap_content",
+                  layout_height : "fill_parent",
+                  layout_gravity : "left"
+                }
+              ]
+            },
+            {
+              klass : "GUILayout",
+              layout_width : "wrap_content",
+              layout_height : "wrap_content",
+              layout_gravity : "bottom",
+              layout_children : [
                 {
                   name : "whaleLayout",
                   klass : "GUILinearLayout",
