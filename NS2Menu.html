@@ -54,6 +54,34 @@ var menuButtonOnMouseOut = function(self, x, y)
   self.setBackgroundColor("rgba(16,16,16,0.95)");
   return;
 }
+var yesCheckboxChecked = function(self, x, y)
+{
+  var nameBox = self.myGUI.findViewByName("textBoxName");
+  nameBox.setText("[IAM] A Whale");
+  var noCheckbox = self.myGUI.findViewByName("checkboxno");
+  noCheckbox.setChecked(false);
+  return;
+}
+var noCheckboxChecked = function(self, x, y)
+{
+  var nameBox = self.myGUI.findViewByName("textBoxName");
+  nameBox.setText("[IAM] Captain Ahab");
+  var yesCheckbox = self.myGUI.findViewByName("checkboxyes");
+  yesCheckbox.setChecked(false);
+  return;
+}
+var yesCheckboxUnchecked = function(self, x, y)
+{
+  var nameBox = self.myGUI.findViewByName("textBoxName");
+  nameBox.setText("[IAM] The Captain");
+  return;
+}
+var noCheckboxUnchecked = function(self, x, y)
+{
+  var nameBox = self.myGUI.findViewByName("textBoxName");
+  nameBox.setText("[IAM] The Captain");
+  return;
+}
 
 /* GUI JSON */
 LayoutB = {
@@ -88,7 +116,7 @@ LayoutB = {
         {
           klass : "GUILayout",
           layout_width : "fill_parent",
-          layout_height : "50%",
+          layout_height : "60%",
           layout_gravity : "center",
           background_color : "rgba(0,0,0,0)",
           layout_children : [
@@ -309,8 +337,9 @@ LayoutB = {
                   layout_gravity : "left"
                 },
                 {
+                  name : "textBoxName",
                   klass : "GUITextView",
-                  text : " [IAM] The Captain",
+                  text : "[IAM] The Captain",
                   textSize : "20px",
                   textFont : "Arial",
                   textColor : "#F88017",
@@ -321,15 +350,105 @@ LayoutB = {
               ]
             },
             {
-              klass : "GUICheckBoxView",
-              background_color : "rgba(0, 0, 0, 0.75)",
-              border_color : "rgba(0, 0, 0, 1)",
-              border_size : "2px",
-              layout_width : "25px",
-              layout_height : "25px",
-              padding : "2.5px",
-              textColor : "#F88017",
-              layout_gravity : "bottom"
+              klass : "GUILinearLayout",
+              layout_width : "wrap_content",
+              layout_height : "wrap_content",
+              layout_orientation : "vertical",
+              layout_gravity : "bottom",
+              padding : "10px",
+              background_color : "rgba(0,0,0,0.5)",
+              layout_children : [
+                {
+                  klass : "GUITextView",
+                  text : "A wizard has turned you into a whale.",
+                  textSize : "20px",
+                  textFont : "Arial",
+                  textColor : "#FFFFFF",
+                  layout_width : "wrap_content",
+                  layout_height : "30px",
+                  layout_gravity : "left"
+                },
+                {
+                  klass : "GUIView",
+                  layout_width : "fill_parent",
+                  layout_height : "20px",
+                  background_color : "rgba(0,0,0,0)"
+                },
+                {
+                  klass : "GUITextView",
+                  text : "Is this awesome?",
+                  textSize : "20px",
+                  textFont : "Arial",
+                  textColor : "#FFFFFF",
+                  layout_width : "wrap_content",
+                  layout_height : "30px",
+                  layout_gravity : "left"
+                },
+                {
+                  klass : "GUIView",
+                  layout_width : "fill_parent",
+                  layout_height : "20px",
+                  background_color : "rgba(0,0,0,0)"
+                },
+                {
+                  klass : "GUILinearLayout",
+                  layout_width : "wrap_content",
+                  layout_height : "wrap_content",
+                  layout_orientation : "horizontal",
+                  padding : "5px",
+                  layout_gravity : "center",
+                  layout_children : [
+                    {
+                      name : "checkboxyes",
+                      klass : "GUICheckBoxView",
+                      background_color : "rgba(0, 0, 0, 0.75)",
+                      border_color : "rgba(0, 0, 0, 1)",
+                      border_size : "5px",
+                      layout_width : "25px",
+                      layout_height : "25px",
+                      checkbox_color : "#F88017",
+                      layout_gravity : "left",
+                      on_checked : "yesCheckboxChecked",
+                      on_unchecked : "yesCheckboxUnchecked"
+                    },
+                    {
+                      name : "textBoxName",
+                      klass : "GUITextView",
+                      text : "Y",
+                      textSize : "20px",
+                      textFont : "Arial",
+                      textColor : "#FFFFFF",
+                      layout_width : "wrap_content",
+                      layout_height : "wrap_content",
+                      layout_gravity : "left"
+                    },
+                    {
+                      name : "checkboxno",
+                      klass : "GUICheckBoxView",
+                      background_color : "rgba(0, 0, 0, 0.75)",
+                      border_color : "rgba(0, 0, 0, 1)",
+                      border_size : "5px",
+                      layout_width : "25px",
+                      layout_height : "25px",
+                      checkbox_color : "#F88017",
+                      layout_gravity : "left",
+                      on_checked : "noCheckboxChecked",
+                      on_unchecked : "noCheckboxUnchecked"
+                    },
+                    {
+                      name : "textBoxName",
+                      klass : "GUITextView",
+                      text : "N",
+                      textSize : "20px",
+                      textFont : "Arial",
+                      textColor : "#FFFFFF",
+                      layout_width : "wrap_content",
+                      layout_height : "wrap_content",
+                      layout_gravity : "left"
+                    },
+                  ]
+                },
+              ]
             }
           ]
         },

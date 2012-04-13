@@ -48,9 +48,27 @@ function GUIMouseEvent(handler, ev)
     y = ev.offsetY;
   }
   
+  var pos = findPos(this.getCanvas());
+  x = x - pos.x;
+  y = y - pos.y;
+  
   handler(x, y);
-
 }
+
+//get mouse offset of canvas relative to screen
+//http://www.quirksmode.org/js/findpos.html
+function findPos(obj) {
+    var curleft = 0, curtop = 0;
+    if (obj.offsetParent) {
+        do {
+            curleft += obj.offsetLeft;
+            curtop += obj.offsetTop;
+        } while (obj = obj.offsetParent);
+        return { x: curleft, y: curtop };
+    }
+    return undefined;
+}
+
 
 /* GUI */
 function GUI()
@@ -114,10 +132,10 @@ function GUI()
 
   this.findViewByName = function(name)
   {
-    for (var i = 0; i < myViews.length; i++) 
+    for (var viewId in myViews) 
     {
-      var view = myViews[i];
-      if (view.name === name)
+      var view = myViews[viewId];
+      if (view.getName() === name)
       {
         return view;
       }
@@ -1017,7 +1035,7 @@ GUILinearLayout.prototype.childRect = function(x, y, width, height, index)
         if (index == i)
         {
           return {
-            x : parentX,
+            x : parentX + offsetX,
             y : parentY + offsetY,
             width : parentWidth,
             height : childHeight
@@ -1028,7 +1046,7 @@ GUILinearLayout.prototype.childRect = function(x, y, width, height, index)
         {
           return {
             x : parentX + offsetX,
-            y : parentY,
+            y : parentY + offsetY,
             width : childWidth,
             height : parentHeight
           }
@@ -1080,7 +1098,7 @@ GUITextView.prototype.inflate = function(viewJSON)
   GUITextView.prototype.parent.inflate.call(this, viewJSON);
   if (viewJSON.text) 
   {
-    this.myText = viewJSON.text;
+    this.setText(viewJSON.text);
   }
   if (viewJSON.textColor) 
   {
@@ -1100,16 +1118,31 @@ GUITextView.prototype.inflate = function(viewJSON)
   }
 }
 
+GUITextView.prototype.setText = function(text)
+{
+  this.myText = text;
+}
+
 //Override
 GUITextView.prototype.measureContentWidth = function()
 {
-  return this.myPadding * 2 + this.myGUI.measureText(this.myText, this.myTextSize, this.myFont, this.isTextBold);
+  if (this.isWidthWrap)
+  {
+    return this.myPadding * 2 + this.myGUI.measureText(this.myText, this.myTextSize, this.myFont, this.isTextBold);
+  } else {
+    return GUITextView.prototype.parent.measureContentHeight.call(this);
+  }
 }
 
 //Override
 GUITextView.prototype.measureContentHeight = function()
 {
-  return this.myPadding * 2 + this.myTextSize;
+  if (this.isHeightWrap)
+  {
+    return this.myPadding * 2 + this.myTextSize;
+  } else {
+    return GUITextView.prototype.parent.measureContentHeight.call(this);
+  }
 }
 
 //Override
@@ -1285,19 +1318,53 @@ function GUICheckBoxView(gui)
 {
   this.myGUI = gui;
   this.checked = false;
-  this.showMouseOver = false;
-  this.showMouseDown = false;
+  this.myCheckboxColor = "rgba(255,255,255,0.75)";
+  this.myCheckedListener;
+  this.myUncheckedListener;
 }
 GUICheckBoxView.inheritsFrom(GUIButtonView);
 
 GUICheckBoxView.prototype.inflate = function(viewJSON)
 {
   GUICheckBoxView.prototype.parent.inflate.call(this, viewJSON);
+  //TODO: regex to ensure a valid function
+  if (viewJSON.on_checked)
+  {
+    var fnString = viewJSON.on_checked;
+    this.myCheckedListener = fnString;
+  }
+  if (viewJSON.on_unchecked)
+  {
+    var fnString = viewJSON.on_unchecked;
+    this.myUncheckedListener = fnString;
+  }
+  if (viewJSON.checkbox_color)
+  {
+    this.myCheckboxColor = viewJSON.checkbox_color;
+  }
+}
+
+GUICheckBoxView.prototype.setChecked = function(checked)
+{
+  this.checked = checked;
+}
+
+GUICheckBoxView.prototype.toggleChecked = function()
+{
+  this.checked = !this.checked;
 }
 
 GUICheckBoxView.prototype.didMouseClick = function(eventX, eventY)
 {
-  this.checked = !this.checked;
+  this.toggleChecked();
+  if (this.checked && this.myCheckedListener)
+  {
+    var fn = eval(this.myCheckedListener);
+    fn(this, eventX, eventY);
+  } else if (!this.checked && this.myUncheckedListener) {
+    var fn = eval(this.myUncheckedListener);
+    fn(this, eventX, eventY);
+  }
 }
 
 GUICheckBoxView.prototype.draw = function(x, y, width, height)
@@ -1305,13 +1372,8 @@ GUICheckBoxView.prototype.draw = function(x, y, width, height)
   GUICheckBoxView.prototype.parent.draw.call(this, x, y, width, height);
   if (this.checked || !this.checked && this.depressed)
   {
-    this.myGUI.drawText("X", this.offsetX(x, width), this.offsetY(y, height), 
-      this.measureX(x, width), this.measureY(y, height),
-      this.myTextColor, this.measureY(y, height), "Arial", true);
-  } else if (!this.checked || this.checked && this.depressed) {
-    this.myGUI.drawText("X", this.offsetX(x, width), this.offsetY(y, height), 
-      this.measureX(x, width), this.measureY(y, height),
-      "rgba(0,0,0,0)", this.measureY(y, height), "Arial", true);
+    this.myGUI.drawRect(this.offsetX(x, width), this.offsetY(y, height), this.measureX(x, width), this.measureY(y, height), true, this.myCheckboxColor);
   }
+  this.drawBorder(x, y, width, height);
 }
 /* END CHECKBOX */
