@@ -1,0 +1,53 @@
+ToyJSGUIFramework
+
+by Steve Caires
+steve.caires@gmail.com
+
+This "Toy" layout system was a project that I used to learn javascript from scratch. It's a simple GUI framework that uses canvas drawing to support flexible layouts of buttons, images, checkboxes, and single line text views, as a simple game menu system might require. Much of the inspiration (and naming conventions, if you can spot them) comes from the Android layout system, which supports multiple resolutions, pixel densities, and devices with ease through relative rather than absolute positioning.
+
+The goals of the project were:
+1) to define layouts in data structures, not code
+2) to nest views in a heirarchy for event handling, drawing, and positioning
+3) to draw a single layout at any resolution, by allowing view width and height to depend on absolute pixel measurements, screen percentage, content size or parent size.
+4) to derive complex view classes from simpler ones, to share and override functionality (note: using an emulation of traditional inheritance, which is not a pattern generally used in javascript)
+
+Views are defined as JS objects, with child views nested within the child arrays of parent layouts. All views are assigned a unique id, and can be retrieved by name with the gui's findViewByName function. 
+
+After creating a GUI object, initializing with a canvas, inflating and setting the root layout, you are ready to call the gui's "update" function (which performs the draw call) from your setInterval function.
+
+View classes and object properties.
+GUIView
+  name : string
+  background_color : color string
+  border_color : color string
+  border_size : pixel size string ["#", or "#px"]
+  layout_width : "wrap_content", "fill_parent", "#", "#px", "#%" (percent of screen, 0 to 100)
+  layout_height : "wrap_content", "fill_parent", "#", "#px", "#%" (percent of screen, 0 to 100)
+  layout_gravity : "top", "topright", "right", "bottomright", "bottom", "bottomleft", "left", "topleft", "center"
+  padding : pixel size string ["#", or "#px"]
+  layout_margin  : pixel size string ["#", or "#px"]
+  on_mouse_down : name of globally defined function(self, eventx, eventy)
+  on_mouse_up : name of globally defined function(self, eventx, eventy)
+  on_mouse_over : name of globally defined function(self, eventx, eventy)
+  on_mouse_out : name of globally defined function(self, eventx, eventy)
+  on_mouse_click : name of globally defined function(self, eventx, eventy)
+  on_load : name of globally defined function(self)
+GUILayout : GUIView
+  layout_children : array of view objects
+GUILinearLayout : GUILayout
+  layout_orientation : "horizontal" or "vertical"
+GUITextView : GUIView
+  text : string
+  textColor : color string
+  textSize : pixel size string ["#", or "#px"]
+  isTextBold : "true" or "false"
+  textFont : font name only ["Arial", "Verdana", etc]
+GUIImageView : GUIView
+  image_src : path string ["img/button.png"]
+GUIButtonView : GUITextView
+  show_mouse_over : "true" or "false", whether to show the default mouseover highlight
+  show_mouse_down : "true" or "false", whether to show the default mouse click highlight
+GUICheckboxView : GUIButtonView
+  on_checked : name of globally defined function(self)
+  on_unchecked : name of globally defined function(self)
+  checkbox_color : color string

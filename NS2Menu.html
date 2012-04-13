@@ -73,20 +73,20 @@ var noCheckboxChecked = function(self)
 
 var whaleMouseover = function(self)
 {
-  self.setVisible(true);
+  var whaleLayout = self.myGUI.findViewByName("whaleLayout");
+  whaleLayout.setVisible(true);
 }
 
 var whaleMouseout = function(self)
 {
-  self.setVisible(false);
+  var whaleLayout = self.myGUI.findViewByName("whaleLayout");
+  whaleLayout.setVisible(false);
 }
 
 var onLoad = function(self)
 {
   var noCheckbox = self.myGUI.findViewByName("checkboxno");
   noCheckbox.setChecked(true);
-  var whaleLayout = self.myGUI.findViewByName("whaleLayout");
-  whaleLayout.setVisible(false);
 }
 
 /* GUI JSON */
@@ -324,138 +324,153 @@ LayoutB = {
                 }
               ]
             },
-
             {
-              klass : "GUILinearLayout",
+              klass : "GUILayout",
               layout_width : "wrap_content",
-              layout_height : "20px",
-              layout_orientation : "horizontal",
+              layout_height : "fill_parent",
               layout_gravity : "center",
               layout_children : [
                 {
-                  klass : "GUITextView",
-                  text : "Welcome back, ",
-                  textSize : "20px",
-                  textFont : "Arial",
-                  textBold : "true",
-                  textColor : "rgba(255,255,255,1.0)",
-                  layout_width : "wrap_content",
-                  layout_height : "fill_parent",
-                  layout_gravity : "left"
-                },
-                {
-                  name : "textBoxName",
-                  klass : "GUITextView",
-                  text : "[IAM] The Captain",
-                  textSize : "20px",
-                  textFont : "Arial",
-                  textColor : "#F88017",
-                  layout_width : "wrap_content",
-                  layout_height : "fill_parent",
-                  layout_gravity : "left"
-                }
-              ]
-            },
-            {
-              name : "whaleLayout",
-              klass : "GUILinearLayout",
-              layout_width : "wrap_content",
-              layout_height : "wrap_content",
-              layout_orientation : "vertical",
-              layout_gravity : "bottom",
-              padding : "10px",
-              background_color : "rgba(0,0,0,0.5)",
-              on_mouse_over : "whaleMouseover",
-              on_mouse_out : "whaleMouseout",
-              layout_children : [
-                {
-                  klass : "GUITextView",
-                  text : "A wizard has turned you into a whale.",
-                  textSize : "20px",
-                  textFont : "Arial",
-                  textColor : "#FFFFFF",
-                  layout_width : "wrap_content",
-                  layout_height : "30px",
-                  layout_gravity : "left"
-                },
-                {
-                  klass : "GUIView",
-                  layout_width : "fill_parent",
-                  layout_height : "20px",
-                  background_color : "rgba(0,0,0,0)"
-                },
-                {
-                  klass : "GUITextView",
-                  text : "Is this awesome?",
-                  textSize : "20px",
-                  textFont : "Arial",
-                  textColor : "#FFFFFF",
-                  layout_width : "wrap_content",
-                  layout_height : "30px",
-                  layout_gravity : "left"
-                },
-                {
-                  klass : "GUIView",
-                  layout_width : "fill_parent",
-                  layout_height : "20px",
-                  background_color : "rgba(0,0,0,0)"
-                },
-                {
                   klass : "GUILinearLayout",
                   layout_width : "wrap_content",
-                  layout_height : "wrap_content",
+                  layout_height : "20px",
                   layout_orientation : "horizontal",
-                  padding : "5px",
                   layout_gravity : "center",
                   layout_children : [
                     {
-                      name : "checkboxyes",
-                      klass : "GUICheckBoxView",
-                      background_color : "rgba(0, 0, 0, 0.75)",
-                      border_color : "rgba(0, 0, 0, 1)",
-                      border_size : "5px",
-                      layout_width : "25px",
-                      layout_height : "25px",
-                      checkbox_color : "#F88017",
-                      layout_gravity : "left",
-                      on_checked : "yesCheckboxChecked"
+                      klass : "GUITextView",
+                      text : "Welcome back, ",
+                      textSize : "20px",
+                      textFont : "Arial",
+                      textBold : "true",
+                      textColor : "rgba(255,255,255,1.0)",
+                      layout_width : "wrap_content",
+                      layout_height : "fill_parent",
+                      layout_gravity : "left"
                     },
                     {
                       name : "textBoxName",
                       klass : "GUITextView",
-                      text : "Y /",
+                      text : "[IAM] The Captain",
                       textSize : "20px",
                       textFont : "Arial",
-                      textColor : "#FFFFFF",
+                      textColor : "#F88017",
                       layout_width : "wrap_content",
-                      layout_height : "wrap_content",
+                      layout_height : "fill_parent",
                       layout_gravity : "left"
-                    },
-                    {
-                      name : "checkboxno",
-                      klass : "GUICheckBoxView",
-                      background_color : "rgba(0, 0, 0, 0.75)",
-                      border_color : "rgba(0, 0, 0, 1)",
-                      border_size : "5px",
-                      layout_width : "25px",
-                      layout_height : "25px",
-                      checkbox_color : "#F88017",
-                      layout_gravity : "left",
-                      on_checked : "noCheckboxChecked"
-                    },
-                    {
-                      name : "textBoxName",
-                      klass : "GUITextView",
-                      text : "N",
-                      textSize : "20px",
-                      textFont : "Arial",
-                      textColor : "#FFFFFF",
-                      layout_width : "wrap_content",
-                      layout_height : "wrap_content",
-                      layout_gravity : "left"
-                    },
+                    }
                   ]
                 },
+                {
+                  name : "whaleLayout",
+                  klass : "GUILinearLayout",
+                  layout_width : "wrap_content",
+                  layout_height : "wrap_content",
+                  layout_orientation : "vertical",
+                  layout_gravity : "bottom",
+                  padding : "10px",
+                  background_color : "rgba(0,0,0,0.5)",
+                  visible : "false",
+                  layout_children : [
+                    {
+                      klass : "GUITextView",
+                      text : "A wizard has turned you into a whale.",
+                      textSize : "20px",
+                      textFont : "Arial",
+                      textColor : "#FFFFFF",
+                      layout_width : "wrap_content",
+                      layout_height : "30px",
+                      layout_gravity : "left"
+                    },
+                    {
+                      klass : "GUIView",
+                      layout_width : "fill_parent",
+                      layout_height : "20px",
+                      background_color : "rgba(0,0,0,0)"
+                    },
+                    {
+                      klass : "GUITextView",
+                      text : "Is this awesome?",
+                      textSize : "20px",
+                      textFont : "Arial",
+                      textColor : "#FFFFFF",
+                      layout_width : "wrap_content",
+                      layout_height : "30px",
+                      layout_gravity : "left"
+                    },
+                    {
+                      klass : "GUIView",
+                      layout_width : "fill_parent",
+                      layout_height : "20px",
+                      background_color : "rgba(0,0,0,0)"
+                    },
+                    {
+                      klass : "GUILinearLayout",
+                      layout_width : "wrap_content",
+                      layout_height : "wrap_content",
+                      layout_orientation : "horizontal",
+                      padding : "5px",
+                      layout_gravity : "center",
+                      layout_children : [
+                        {
+                          name : "checkboxyes",
+                          klass : "GUICheckBoxView",
+                          background_color : "rgba(0, 0, 0, 0.75)",
+                          border_color : "rgba(0, 0, 0, 1)",
+                          border_size : "5px",
+                          layout_width : "25px",
+                          layout_height : "25px",
+                          checkbox_color : "#F88017",
+                          layout_gravity : "left",
+                          on_checked : "yesCheckboxChecked"
+                        },
+                        {
+                          name : "textBoxName",
+                          klass : "GUITextView",
+                          text : "Y /",
+                          textSize : "20px",
+                          textFont : "Arial",
+                          textColor : "#FFFFFF",
+                          layout_width : "wrap_content",
+                          layout_height : "wrap_content",
+                          layout_gravity : "left"
+                        },
+                        {
+                          name : "checkboxno",
+                          klass : "GUICheckBoxView",
+                          background_color : "rgba(0, 0, 0, 0.75)",
+                          border_color : "rgba(0, 0, 0, 1)",
+                          border_size : "5px",
+                          layout_width : "25px",
+                          layout_height : "25px",
+                          checkbox_color : "#F88017",
+                          layout_gravity : "left",
+                          on_checked : "noCheckboxChecked"
+                        },
+                        {
+                          name : "textBoxName",
+                          klass : "GUITextView",
+                          text : "N",
+                          textSize : "20px",
+                          textFont : "Arial",
+                          textColor : "#FFFFFF",
+                          layout_width : "wrap_content",
+                          layout_height : "wrap_content",
+                          layout_gravity : "left"
+                        },
+                      ]
+                    }
+                  ]
+                },
+                {
+                  klass : "GUIView",
+                  layout_width : "fill_parent",
+                  layout_height : "fill_parent",
+                  layout_gravity : "bottom",
+                  background_color : "rgba(0,0,0,0)",
+                  on_mouse_over : "whaleMouseover",
+                  on_mouse_out : "whaleMouseout",
+                }
               ]
             }
           ]

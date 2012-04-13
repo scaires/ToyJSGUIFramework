@@ -429,6 +429,10 @@ GUIView.prototype.inflate = function(viewJSON)
   {
     this.myOnLoadListener = viewJSON.on_load;
   }
+  if (viewJSON.visible && viewJSON.visible === "true" || viewJSON.visible === "false")
+  {
+    this.isVisible = eval(viewJSON.visible);
+  }
 }
 
 //event handling
@@ -440,34 +444,43 @@ GUIView.prototype.onLoad = function()
 
 GUIView.prototype.onMouseDown = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
 {
-  if (this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
+  if (this.isVisible)
   {
-    this.didMouseDown(eventX, eventY);
+    if (this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
+    {
+      this.didMouseDown(eventX, eventY);
+    }
   }
 }
 
 GUIView.prototype.onMouseUp = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
 {
-  if (this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
+  if (this.isVisible)
   {
-    this.didMouseUp(eventX, eventY);
-    if (myGUI.isMouseOverView(this))
+    if (this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
     {
-      this.didMouseClick(eventX, eventY);
+      this.didMouseUp(eventX, eventY);
+      if (myGUI.isMouseOverView(this))
+      {
+        this.didMouseClick(eventX, eventY);
+      }
     }
   }
 }
 
 GUIView.prototype.onMouseMove = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
 {
-  if (this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
+  if (this.isVisible)
   {
-    myGUI.registerMouseOverView(this);
-    this.didMouseOver(eventX, eventY);
-  } else if (myGUI.isMouseOverView(this) && 
-    !this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight)) {
-    myGUI.deregisterMouseOverView(this);
-    this.didMouseOut(eventX, eventY);
+    if (this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
+    {
+      myGUI.registerMouseOverView(this);
+      this.didMouseOver(eventX, eventY);
+    } else if (myGUI.isMouseOverView(this) && 
+      !this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight)) {
+      myGUI.deregisterMouseOverView(this);
+      this.didMouseOut(eventX, eventY);
+    }
   }
 }
 
@@ -778,56 +791,63 @@ GUILayout.prototype.getChildren = function()
 
 GUILayout.prototype.onMouseDown = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
 {
-  GUILayout.prototype.parent.onMouseDown.call(this, eventX, eventY, parentX, parentY, parentWidth, parentHeight);
-  for (var i = 0; i < this.myChildren.length; i++) 
+  if (this.isVisible)
   {
-    var child = this.myChildren[i];
-    var myX = this.offsetX(parentX, parentWidth);
-    var myY = this.offsetY(parentY, parentHeight);
-    var myWidth = this.measureX(parentX, parentWidth);
-    var myHeight = this.measureY(parentY, parentHeight);
-    rect = this.childRect(myX, myY, myWidth, myHeight, i);
-    if (child.testBounds(eventX, eventY, rect.x, rect.y, rect.width, rect.height))
+    GUILayout.prototype.parent.onMouseDown.call(this, eventX, eventY, parentX, parentY, parentWidth, parentHeight);
+    for (var i = 0; i < this.myChildren.length; i++) 
     {
-      child.onMouseDown(eventX, eventY, rect.x, rect.y, rect.width, rect.height);
+      var child = this.myChildren[i];
+      var myX = this.offsetX(parentX, parentWidth);
+      var myY = this.offsetY(parentY, parentHeight);
+      var myWidth = this.measureX(parentX, parentWidth);
+      var myHeight = this.measureY(parentY, parentHeight);
+      rect = this.childRect(myX, myY, myWidth, myHeight, i);
+      if (child.testBounds(eventX, eventY, rect.x, rect.y, rect.width, rect.height))
+      {
+        child.onMouseDown(eventX, eventY, rect.x, rect.y, rect.width, rect.height);
+      }
     }
   }
 }
 
-//unfinished
 GUILayout.prototype.onMouseUp = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
 {
-  GUILayout.prototype.parent.onMouseUp.call(this, eventX, eventY, parentX, parentY, parentWidth, parentHeight);
-  for (var i = 0; i < this.myChildren.length; i++) 
+  if (this.isVisible)
   {
-    var child = this.myChildren[i];
-    var myX = this.offsetX(parentX, parentWidth);
-    var myY = this.offsetY(parentY, parentHeight);
-    var myWidth = this.measureX(parentX, parentWidth);
-    var myHeight = this.measureY(parentY, parentHeight);
-    rect = this.childRect(myX, myY, myWidth, myHeight, i);
-    if (child.testBounds(eventX, eventY, rect.x, rect.y, rect.width, rect.height))
+    GUILayout.prototype.parent.onMouseUp.call(this, eventX, eventY, parentX, parentY, parentWidth, parentHeight);
+    for (var i = 0; i < this.myChildren.length; i++) 
     {
-      child.onMouseUp(eventX, eventY, rect.x, rect.y, rect.width, rect.height);
+      var child = this.myChildren[i];
+      var myX = this.offsetX(parentX, parentWidth);
+      var myY = this.offsetY(parentY, parentHeight);
+      var myWidth = this.measureX(parentX, parentWidth);
+      var myHeight = this.measureY(parentY, parentHeight);
+      rect = this.childRect(myX, myY, myWidth, myHeight, i);
+      if (child.testBounds(eventX, eventY, rect.x, rect.y, rect.width, rect.height))
+      {
+        child.onMouseUp(eventX, eventY, rect.x, rect.y, rect.width, rect.height);
+      }
     }
   }
 }
 
-//unfinished
 GUILayout.prototype.onMouseMove = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
 {
-  GUILayout.prototype.parent.onMouseMove.call(this, eventX, eventY, parentX, parentY, parentWidth, parentHeight);
-  for (var i = 0; i < this.myChildren.length; i++) 
+  if (this.isVisible)
   {
-    var child = this.myChildren[i];
-    var myX = this.offsetX(parentX, parentWidth);
-    var myY = this.offsetY(parentY, parentHeight);
-    var myWidth = this.measureX(parentX, parentWidth);
-    var myHeight = this.measureY(parentY, parentHeight);
-    rect = this.childRect(myX, myY, myWidth, myHeight, i);
-    if (myGUI.isMouseOverView(child) || child.testBounds(eventX, eventY, rect.x, rect.y, rect.width, rect.height))
+    GUILayout.prototype.parent.onMouseMove.call(this, eventX, eventY, parentX, parentY, parentWidth, parentHeight);
+    for (var i = 0; i < this.myChildren.length; i++) 
     {
-      child.onMouseMove(eventX, eventY, rect.x, rect.y, rect.width, rect.height);
+      var child = this.myChildren[i];
+      var myX = this.offsetX(parentX, parentWidth);
+      var myY = this.offsetY(parentY, parentHeight);
+      var myWidth = this.measureX(parentX, parentWidth);
+      var myHeight = this.measureY(parentY, parentHeight);
+      rect = this.childRect(myX, myY, myWidth, myHeight, i);
+      if (myGUI.isMouseOverView(child) || child.testBounds(eventX, eventY, rect.x, rect.y, rect.width, rect.height))
+      {
+        child.onMouseMove(eventX, eventY, rect.x, rect.y, rect.width, rect.height);
+      }
     }
   }
 }
@@ -1063,28 +1083,25 @@ GUILinearLayout.prototype.childRect = function(x, y, width, height, index)
       }
     }
 
-    if (child.isVisible) 
+    if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
     {
-      if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_VERTICAL)
+      if (index == i)
       {
-        if (index == i)
-        {
-          return {
-            x : parentX + offsetX,
-            y : parentY + offsetY,
-            width : parentWidth,
-            height : childHeight
-          }
+        return {
+          x : parentX + offsetX,
+          y : parentY + offsetY,
+          width : parentWidth,
+          height : childHeight
         }
-      } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
-        if (index == i)
-        {
-          return {
-            x : parentX + offsetX,
-            y : parentY + offsetY,
-            width : childWidth,
-            height : parentHeight
-          }
+      }
+    } else if (this.myOrientation == GUI_LINEARLAYOUT_ORIENTATION_HORIZONTAL) {
+      if (index == i)
+      {
+        return {
+          x : parentX + offsetX,
+          y : parentY + offsetY,
+          width : childWidth,
+          height : parentHeight
         }
       }
     }
