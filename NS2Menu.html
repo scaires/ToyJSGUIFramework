@@ -18,7 +18,7 @@ function Update()
 {
   if (myGUI && myGUI.isInitialized())
   {
-    myGUI.draw();
+    myGUI.update();
   }
 }
 
@@ -54,7 +54,7 @@ var menuButtonOnMouseOut = function(self, x, y)
   self.setBackgroundColor("rgba(16,16,16,0.95)");
   return;
 }
-var yesCheckboxChecked = function(self, x, y)
+var yesCheckboxChecked = function(self)
 {
   var nameBox = self.myGUI.findViewByName("textBoxName");
   nameBox.setText("[IAM] A Whale");
@@ -62,25 +62,20 @@ var yesCheckboxChecked = function(self, x, y)
   noCheckbox.setChecked(false);
   return;
 }
-var noCheckboxChecked = function(self, x, y)
+var noCheckboxChecked = function(self)
 {
   var nameBox = self.myGUI.findViewByName("textBoxName");
-  nameBox.setText("[IAM] Captain Ahab");
+  nameBox.setText("[IAM] The Captain");
   var yesCheckbox = self.myGUI.findViewByName("checkboxyes");
   yesCheckbox.setChecked(false);
   return;
 }
-var yesCheckboxUnchecked = function(self, x, y)
+
+var onLoad = function()
 {
-  var nameBox = self.myGUI.findViewByName("textBoxName");
-  nameBox.setText("[IAM] The Captain");
-  return;
-}
-var noCheckboxUnchecked = function(self, x, y)
-{
-  var nameBox = self.myGUI.findViewByName("textBoxName");
-  nameBox.setText("[IAM] The Captain");
-  return;
+  var noCheckbox = self.myGUI.findViewByName("checkboxno");
+  noCheckbox.setChecked(true);
+  alert("Loaded!");
 }
 
 /* GUI JSON */
@@ -92,6 +87,7 @@ LayoutB = {
   layout_height : "fill_parent",
   border_color : "rgb(0,0,0)",
   border_size : "10px",
+  on_load : "onLoad",
   layout_children : [
     {
       klass : "GUIImageView",
@@ -408,8 +404,7 @@ LayoutB = {
                       layout_height : "25px",
                       checkbox_color : "#F88017",
                       layout_gravity : "left",
-                      on_checked : "yesCheckboxChecked",
-                      on_unchecked : "yesCheckboxUnchecked"
+                      on_checked : "yesCheckboxChecked"
                     },
                     {
                       name : "textBoxName",
@@ -432,8 +427,7 @@ LayoutB = {
                       layout_height : "25px",
                       checkbox_color : "#F88017",
                       layout_gravity : "left",
-                      on_checked : "noCheckboxChecked",
-                      on_unchecked : "noCheckboxUnchecked"
+                      on_checked : "noCheckboxChecked"
                     },
                     {
                       name : "textBoxName",

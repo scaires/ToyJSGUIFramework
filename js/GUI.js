@@ -79,6 +79,7 @@ function GUI()
   var myViewIndex;
   var myViews;
   var myMouseOverViewIds;
+  var initialized;
 
   //privileged
   this.init = function(canvas) 
@@ -91,7 +92,6 @@ function GUI()
     myCanvas.addEventListener('mousedown',   GUIMouseEvent.bind(this, this.onMouseDown), false);
     myCanvas.addEventListener('mouseup',  GUIMouseEvent.bind(this, this.onMouseUp), false);
     myCanvas.addEventListener('mousemove',  GUIMouseEvent.bind(this, this.onMouseMove), false);
-    isInitialized = true;
   }
   
   this.isInitialized = function()
@@ -99,6 +99,19 @@ function GUI()
     return (myContext != undefined && myLayout != undefined); 
   }
   
+  this.update = function()
+  {
+    if (myContext && myLayout)
+    {
+      if (!initialized)
+      {
+        initialized = true;
+        myLayout.onLoad();
+      }
+      this.draw();
+    }
+  }
+
   this.inflate = function(viewJSON)
   {
     if (viewJSON)
@@ -165,11 +178,8 @@ function GUI()
 
   this.draw = function() 
   {
-    if (myContext && myLayout)
-    {
-      this.clearRect(0, 0, myCanvas.width, myCanvas.height);
-      myLayout.draw(0, 0, myCanvas.width, myCanvas.height);
-    }
+    this.clearRect(0, 0, myCanvas.width, myCanvas.height);
+    myLayout.draw(0, 0, myCanvas.width, myCanvas.height);
   }
   
   this.clearRect = function(x, y, width, height)
@@ -325,6 +335,7 @@ function GUIView(gui)
   this.myMouseOverListener;
   this.myMouseOutListener;
   this.myMouseClickListener;
+  this.myOnLoadListener;
 }
 
 GUIView.prototype.init = function()
@@ -396,33 +407,37 @@ GUIView.prototype.inflate = function(viewJSON)
   //TODO: regex to ensure a valid function
   if (viewJSON.on_mouse_down)
   {
-    var fnString = viewJSON.on_mouse_down;
-    this.myMouseDownListener = fnString;
+    this.myMouseDownListener = viewJSON.on_mouse_down;
   }
   if (viewJSON.on_mouse_up)
   {
-    var fnString = viewJSON.on_mouse_up;
-    this.myMouseUpListener = fnString;
+    this.myMouseUpListener = viewJSON.on_mouse_up;
   }
   if (viewJSON.on_mouse_over)
   {
-    var fnString = viewJSON.on_mouse_over;
-    this.myMouseOverListener = fnString;
+    this.myMouseOverListener = viewJSON.on_mouse_over;
   }
   if (viewJSON.on_mouse_out)
   {
-    var fnString = viewJSON.on_mouse_out;
-    this.myMouseOutListener = fnString;
+    this.myMouseOutListener = viewJSON.on_mouse_out;
   }
   if (viewJSON.on_mouse_click)
   {
-    var fnString = viewJSON.on_mouse_click;
-    this.myMouseClickListener = fnString;
+    this.myMouseClickListener = viewJSON.on_mouse_click;
+  }
+  if (viewJSON.on_load)
+  {
+    this.myOnLoadListener = viewJSON.on_load;
   }
 }
 
 //event handling
 //only override if the parent dimensions are necessary (for example, layouts testing children)
+GUIView.prototype.onLoad = function()
+{
+  this.didLoad();
+}
+
 GUIView.prototype.onMouseDown = function(eventX, eventY, parentX, parentY, parentWidth, parentHeight)
 {
   if (this.testBounds(eventX, eventY, parentX, parentY, parentWidth, parentHeight))
@@ -457,6 +472,16 @@ GUIView.prototype.onMouseMove = function(eventX, eventY, parentX, parentY, paren
 }
 
 //override to get basic functionality after the event occurs (for example, a mouseover effect for a button)
+//fired when the entire view heirarchy has been loaded
+GUIView.prototype.didLoad = function()
+{
+  if (this.myOnLoadListener)
+  {
+    var fn = eval(this.myOnLoadListener);
+    fn(this);
+  }
+}
+
 GUIView.prototype.didMouseDown = function(eventX, eventY)
 {
   if (this.myMouseDownListener)
@@ -804,6 +829,16 @@ GUILayout.prototype.onMouseMove = function(eventX, eventY, parentX, parentY, par
     {
       child.onMouseMove(eventX, eventY, rect.x, rect.y, rect.width, rect.height);
     }
+  }
+}
+
+GUILayout.prototype.onLoad = function()
+{
+  GUILayout.prototype.parent.onLoad.call(this);
+  for (var i = 0; i < this.myChildren.length; i++) 
+  {
+    var child = this.myChildren[i];
+    child.onLoad();
   }
 }
 
@@ -1347,24 +1382,24 @@ GUICheckBoxView.prototype.inflate = function(viewJSON)
 GUICheckBoxView.prototype.setChecked = function(checked)
 {
   this.checked = checked;
+  if (this.checked && this.myCheckedListener)
+  {
+    var fn = eval(this.myCheckedListener);
+    fn(this);
+  } else if (!this.checked && this.myUncheckedListener) {
+    var fn = eval(this.myUncheckedListener);
+    fn(this);
+  }
 }
 
 GUICheckBoxView.prototype.toggleChecked = function()
 {
-  this.checked = !this.checked;
+  this.setChecked(!this.checked);
 }
 
 GUICheckBoxView.prototype.didMouseClick = function(eventX, eventY)
 {
   this.toggleChecked();
-  if (this.checked && this.myCheckedListener)
-  {
-    var fn = eval(this.myCheckedListener);
-    fn(this, eventX, eventY);
-  } else if (!this.checked && this.myUncheckedListener) {
-    var fn = eval(this.myUncheckedListener);
-    fn(this, eventX, eventY);
-  }
 }
 
 GUICheckBoxView.prototype.draw = function(x, y, width, height)
