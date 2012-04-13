@@ -29,13 +29,16 @@ Known Issues:
 - Many properties are defined only in the layout definition and do not have setter/getter methods. All views have properties exposed, so these can be used for reading from or modifying views.
 - OnClick fires for whatever view the mouse is over when it is released, instead of requiring the mouse to be over the same view for the mousedown and mouseup event.
 - Some text may show outside of its view boundary, especially with padding or margins.
+- There are no density independent pixels, so supporting multiple resolutions is too difficult
 
 Future Plans:
+- Density independent pixels (for better scaling for multiresolution support)
 - Animations
 - Better handling of mouse events (some views "capture" mouse events so they are not propagated to other views)
 - Aspect fit for images
-- Improved measurements / fixed layout bugs
+- Improved measurements / fixed layout bugs / improved linearlayout
 - Multiline text
+- Better handling of multiple resolutions
 
 Reference: View classes and object properties.
 GUIView
