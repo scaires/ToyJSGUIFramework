@@ -209,7 +209,8 @@ function GUI()
     {
       boldText = "bold";
     }
-    myContext.font = boldText + (textSize.toString() + "px " + font);
+    correctedSize = Math.min(textSize, maxHeight);
+    myContext.font = boldText + (correctedSize.toString() + "px " + font);
     myContext.fillStyle = color;
     myContext.textBaseline = "middle";
     var correctedX = x;
@@ -225,7 +226,7 @@ function GUI()
     }
     if (maxWidth > 0) 
     {
-      myContext.fillText(text, correctedX, correctedY + maxHeight/2, maxWidth);
+      myContext.fillText(text, correctedX, correctedY + textSize/2, maxWidth);
     }
   }
   
@@ -1063,11 +1064,11 @@ GUILinearLayout.prototype.childRect = function(x, y, width, height, index)
       childHeight = parentHeight;
     }
 
-    if (childOffsetX + childWidth > x + width)
+    if (childOffsetX + childWidth > parentX + parentWidth)
     {
-      if (childOffsetX < x + width)
+      if (childOffsetX < parentX + parentWidth)
       {
-        childWidth = x + width - (childOffsetX);
+        childWidth = parentX + parentWidth - (childOffsetX);
       } else {
         childWidth = 0;
       }

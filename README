@@ -31,7 +31,7 @@ GUIView
   on_mouse_over : name of globally defined function(self, eventx, eventy)
   on_mouse_out : name of globally defined function(self, eventx, eventy)
   on_mouse_click : name of globally defined function(self, eventx, eventy)
-  on_load : name of globally defined function(self)
+  on_load : name of globally defined function(self). Called when entire gui has loaded.
 GUILayout : GUIView
   layout_children : array of view objects
 GUILinearLayout : GUILayout

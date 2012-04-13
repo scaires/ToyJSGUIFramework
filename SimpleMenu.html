@@ -1,0 +1,113 @@
+<html>
+<head>
+<title>NS2 Main Menu</title>
+<script type='text/javascript' src='js/GUI.js'></script>
+<script type="text/javascript">
+
+var myGUI;
+
+function Init()
+{
+  myGUI = new GUI();
+  myGUI.init(document.getElementById("maincanvas"));
+  var layout = myGUI.inflate(LayoutB);
+  myGUI.setLayout(layout);
+}
+
+function Update()
+{
+  if (myGUI && myGUI.isInitialized())
+  {
+    myGUI.update();
+  }
+}
+
+setInterval(Update, 20);
+
+var buttonOnMouseClick = function(self, x, y)
+{
+  alert("Clicked!");
+  return;
+}
+
+var onLoad = function(self)
+{
+  alert("Loaded!");
+}
+
+var menuOnMouseOver = function(self)
+{
+  var layout = self.myGUI.findViewByName("menuLayout");
+  layout.setBackgroundColor("rgba(255,0,0,0.5)");
+}
+
+var menuOnMouseOut = function(self)
+{
+  var layout = self.myGUI.findViewByName("menuLayout");
+  layout.setBackgroundColor("rgba(0,0,0,0.5)");
+}
+
+/* GUI JSON */
+LayoutB = {
+  name : "menuLayout",
+  klass : "GUILayout",
+  background_color : "rgba(0,0,0,0.5)",
+  layout_width : "fill_parent",
+  layout_height : "fill_parent",
+  border_color : "rgb(0,0,0)",
+  border_size : "5px",
+  on_load : "onLoad",
+  layout_children : [
+    {
+      klass : "GUILinearLayout",
+      background_color : "rgba(0, 0, 0, 0)",
+      layout_width : "50%",
+      layout_height : "50%",
+      layout_orientation : "horizontal",
+      layout_gravity : "center",
+      background_color : "rgba(0,0,0,0.5)",
+      border_color : "rgb(0,0,0)",
+      border_size : "5px",
+      padding : "0",
+      on_mouse_over : "menuOnMouseOver",
+      on_mouse_out : "menuOnMouseOut",
+      layout_children : [
+        {
+          klass : "GUIButtonView",
+          background_color : "rgba(0, 0, 0, 0)",
+          padding : "2.5px",
+          text : "Button",
+          textSize : "20px",
+          textFont : "Arial",
+          textColor : "rgba(255,255,255,0.75)",
+          border_color : "rgb(0,0,0)",
+          border_size : "2px",
+          layout_width : "100px",
+          layout_height : "50px",
+          layout_gravity : "top"
+        },
+        {
+          klass : "GUITextView",
+          background_color : "rgba(0, 0, 0, 0)",
+          padding : "2.5px",
+          text : "Text view",
+          textSize : "20px",
+          textFont : "Arial",
+          textColor : "rgba(255,255,255,0.75)",
+          layout_width : "fill_parent",
+          layout_height : "50px",
+          layout_gravity : "top"
+        }
+      ]
+    }
+  ]
+}
+
+/* END GUI JSON */
+
+</script>
+</head>
+<body onload="Init();">
+<canvas id="maincanvas" width="400" height="400"></canvas>
+</body>
+</html>
